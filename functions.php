@@ -1,37 +1,37 @@
 <?php
-/*
-*	Wikeasy - http://wikeasy.dicssy.net
-*	Copyright (c) 2011  dixy <wikeasy@dicssy.net>
-*	Licensed under the GNU GPL license. See http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-*/
+/**
+ *	Wikeasy - http://wikeasy.dicssy.net
+ *	Copyright (c) 2011  dixy <wikeasy@dicssy.net>
+ *	Licensed under the GNU GPL license. See http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 define('RETURN_VAL', TRUE); //Permet de retourner une valeur au lieu de l'afficher
 
 define('DT_HOUR', TRUE); //Permet d'afficher l'heure avec une date
 define('DT_INTERVAL', TRUE); //Permet d'afficher un intervalle de temps plutôt qu'une date
 
-/*
-*	Retourne le titre de l'article à mettre dans une URL, à partir d'un
-*	titre étant déjà passé à la fonction `clean_url`.
-*/
+/**
+ *	Retourne le titre de l'article à mettre dans une URL, à partir d'un
+ *	titre étant déjà passé à la fonction `clean_url`.
+ */
 function art_title2url($title)
 {
 	return urlencode(str_replace(' ', '_', $title));
 }
 
-/*
-*	Retourne le titre à afficher de l'article à partir d'un titre étant déjà,
-*	passé à la fonction `clean_title`.
-*/
+/**
+ *	Retourne le titre à afficher de l'article à partir d'un titre étant déjà,
+ *	passé à la fonction `clean_title`.
+ */
 function art_title($name)
 {
 	return str_replace('_', ' ', $name);
 }
 
-/*
-*	Supprime tous les caractères non autorisés du titre de l'article.
-*	Ces deux expressions rationnelles proviennent de MediaWiki 1.16.
-*/
+/**
+ *	Supprime tous les caractères non autorisés du titre de l'article.
+ *	Ces deux expressions rationnelles proviennent de MediaWiki 1.16.
+ */
 function clean_title($url)
 {
 	if ($url[0] == ':')
@@ -43,11 +43,11 @@ function clean_title($url)
 	return ucfirst(trim($url, '_'));
 }
 
-/*
-*	Retourne les informations sur une page.
-*
-*	@param $nom		Nom de la page, si elle n'existe pas retourne des valeurs par défaut.
-*/
+/**
+ *	Retourne les informations sur une page.
+ *
+ *	@param $nom		Nom de la page, si elle n'existe pas retourne des valeurs par défaut.
+ */
 function get_page($nom, $namespace = '')
 {
     if ($namespace == '')
@@ -96,10 +96,10 @@ function get_page($nom, $namespace = '')
 	return $return;
 }
 
-/*
-*	Créé le fichier d'un article.
-*	Si l'article existait déjà il sera écrasé.
-*/
+/**
+ *	Créé le fichier d'un article.
+ *	Si l'article existait déjà il sera écrasé.
+ */
 function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, $savelast = TRUE)
 {
 	if ($ns == '')
@@ -137,17 +137,17 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	return write_file(PATH_PG.$ns.'/'.$page['name'].'.xml', $fichier_contenu);
 }
 
-/*
-*	Vérifie si l'utilisateur peut modifier une page.
-*/
+/**
+ *	Vérifie si l'utilisateur peut modifier une page.
+ */
 function check_access($page)
 {
 	return !($page['status'] == 'private' || config_item('proteger_pages')) || $_SESSION['wik_connect'];
 }
 
-/*
-*	Redirection.
-*/
+/**
+ *	Redirection.
+ */
 function redirect($url = '')
 {
 	if ($url == '')
@@ -157,9 +157,9 @@ function redirect($url = '')
 	exit;
 }
 
-/*
-*	Créé un fichier.
-*/
+/**
+ *	Créé un fichier.
+ */
 function write_file($name, $content = '')
 {
 	if (!is_writable(dirname($name))) return FALSE;
@@ -179,9 +179,9 @@ function write_file($name, $content = '')
 	return (is_file($name) && $ok);
 }
 
-/*
-*	Créé le fichier de cache contenant la liste des articles.
-*/
+/**
+ *	Créé le fichier de cache contenant la liste des articles.
+ */
 function generate_cache_list($namespace)
 {
 	$list_articles = array();
@@ -210,9 +210,9 @@ function generate_cache_list($namespace)
 	write_file(PATH_CNT.$namespace.'_articles.php', '<?php $list_articles = '.var_export($list_articles, true).';');
 }
 
-/*
-*	Défini le titre de la page.
-*/
+/**
+ *	Défini le titre de la page.
+ */
 function set_title($title = '')
 {
 	static $stored_title = '';
@@ -226,9 +226,9 @@ function get_title()
 	echo $title.(!empty($title) ? ' - ' : '').config_item('nom_wiki');
 }
 
-/*
-*	Installation du wiki.
-*/
+/**
+ *	Installation du wiki.
+ */
 function install()
 {
 	$dossier = dirname(__FILE__).'/content';
@@ -237,6 +237,8 @@ function install()
 		mkdir($dossier.'/pages', 0777);
 		mkdir($dossier.'/historique', 0777);
 		mkdir($dossier.'/suppressions', 0777);
+		mkdir($dossier.'/pages/Principal', 0777);
+		mkdir($dossier.'/historique/Principal', 0777);
 		$config = array(
 			'page_defaut' => 'Accueil', 'utilisateur' => 'admin', 'nom_wiki' => 'Wikeasy', 'theme' => 'default',
 			'motdepasse' => '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'pageurl_type' => 'normal', 
@@ -255,9 +257,9 @@ function install()
 			 'chmod de 777 pour pouvoir cr&eacute;er le dossier contenant les pages ainsi que le fichier de configuration.');
 }
 
-/*
-*	URL du thème utilisé.
-*/
+/**
+ *	URL du thème utilisé.
+ */
 function theme_url($return = FALSE)
 {
 	if ($return) return 'themes/'.config_item('theme').'/';
@@ -317,9 +319,9 @@ function parsewiki($text)
 	return $wiki->render($text);
 }
 
-/*
-*	Retourne l'url de la page en fonction de la configuration.
-*/
+/**
+ *	Retourne l'url de la page en fonction de la configuration.
+ */
 function pageurl($normal, $rewrite = '')
 {
 	if (empty($rewrite))
@@ -332,9 +334,9 @@ function pageurl($normal, $rewrite = '')
 	return $normal;
 }
 
-/*
-*	Enregistre la modification qui vient d'être effectuée.
-*/
+/**
+ *	Enregistre la modification qui vient d'être effectuée.
+ */
 function save_last_change($pagetitle, $version = 0, $special = array())
 {
 	if (!is_file(PATH_CNT.'modifications_recentes.php')) $recentchanges = array();
@@ -361,9 +363,9 @@ function save_last_change($pagetitle, $version = 0, $special = array())
 		'<?php $recentchanges = '.var_export($recentchanges, true).';');
 }
 
-/*
-*	Formate une date.
-*/
+/**
+ *	Formate une date.
+ */
 function format_date($date, $hour = FALSE, $interval = FALSE)
 {
 	if (empty($date))
@@ -388,11 +390,11 @@ function format_date($date, $hour = FALSE, $interval = FALSE)
 	return ($j == 1 ? '1<sup>er</sup>' : $j).' '.$str_month[date('n', $date)-1].' '.date('Y', $date).($hour ? ' à '.date('H\hi', $date) : '');
 }
 
-/*
-*	Supprime tout l'historique d'un article.
-*	@param	(string) $page		Nom de la page.
-*	@param	(bool)	 $dirtoo	S'il faut aussi supprimer le dossier.
-*/
+/**
+ *	Supprime tout l'historique d'un article.
+ *	@param	(string) $page		Nom de la page.
+ *	@param	(bool)	 $dirtoo	S'il faut aussi supprimer le dossier.
+ */
 function delete_history($page, $namespace, $dirtoo = TRUE)
 {
 	$path_dir = PATH_CNT.'historique/'.$namespace.'/'.$page;
@@ -409,12 +411,12 @@ function delete_history($page, $namespace, $dirtoo = TRUE)
 	return is_dir($path_dir);
 }
 
-/*
-*	Retourne un mot au singulier ou pluriel suivant le nombre $nbr
-*	@param	(int)		$nbr	Nombre à tester
-*	@param	(string)	$sing	Singulier du mot ou de la phrase
-*	@param	(string)	$plu	Pluriel à retourner (facultatif)
-*/
+/**
+ *	Retourne un mot au singulier ou pluriel suivant le nombre $nbr
+ *	@param	(int)		$nbr	Nombre à tester
+ *	@param	(string)	$sing	Singulier du mot ou de la phrase
+ *	@param	(string)	$plu	Pluriel à retourner (facultatif)
+ */
 function plural($nbr, $sing, $plu = NULL)
 {
 	if ($nbr > 1)
@@ -423,9 +425,9 @@ function plural($nbr, $sing, $plu = NULL)
 	return $sing;
 }
 
-/*
-*	Créé le fichier contenant la liste des articles supprimés.
-*/
+/**
+ *	Créé le fichier contenant la liste des articles supprimés.
+ */
 function generate_deleted_articles_cache()
 {
 	$deleted = array();
@@ -441,9 +443,9 @@ function generate_deleted_articles_cache()
 	write_file(PATH_CNT.'liste_supprimes', serialize(array_flip($deleted)));
 }
 
-/*
-*	Liste des articles supprimés.
-*/
+/**
+ *	Liste des articles supprimés.
+ */
 function deleted_articles()
 {
 	if (!is_file(PATH_CNT.'liste_supprimes'))
@@ -452,12 +454,12 @@ function deleted_articles()
 	return unserialize(file_get_contents(PATH_CNT.'liste_supprimes'));
 }
 
-/*
-*	Retourne le paramètre de configuration demandé
-*	
-*	@param string $item   Nom du paramètre recherché
-*	@param string $newval Permet de modifier la valeur du paramètre
-*/
+/**
+ *	Retourne le paramètre de configuration demandé
+ *	
+ *	@param string $item   Nom du paramètre recherché
+ *	@param string $newval Permet de modifier la valeur du paramètre
+ */
 function config_item($item = '', $newval = '')
 {
 	static $_config = array();
@@ -488,13 +490,14 @@ function config_item($item = '', $newval = '')
 		return FALSE;
 }
 
-/*
-*   Affiche une page avec un message.
-*/
+/**
+ *   Affiche une page avec un message.
+ */
 function show_error($message, $heading = 'Erreur', $back_index = TRUE)
 {
 	set_title($heading);
 	require PATH.theme_url(RETURN_VAL).'message.php';
 	exit;
 }
-?>
+
+/* End of file functions.php */
