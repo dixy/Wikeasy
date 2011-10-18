@@ -46,7 +46,7 @@ h1 + .bloc-erreur { margin-top: 1em; }
 fieldset 			{ margin: 10px 0 20px 0; padding: 5px 10px 10px; border: 2px solid #e3e7ec; }
 fieldset p 			{ margin: 0; padding: 12px 0 2px 0; color: #666666;}
 input, textarea 	{ border: 1px solid #808080; background: #F3F3F3; }
-textarea 			{ width: 80%; }
+textarea 			{ width: 99%; }
 input 				{ margin: 0 8px 0 0; padding: 2px; }
 input:focus, textarea:focus { outline-width: 0; }
 .submit 			{ padding: 2px 10px; }
