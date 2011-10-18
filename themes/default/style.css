@@ -1,0 +1,93 @@
+/* Général */
+body { background-color: #fff; color: #333; font-family: 'Trebuchet MS', 'Lucida Grande', Verdana, Arial, Sans-Serif;font-size: 72.5%;margin: 0; padding: 0;}
+
+/* Liens */
+a { color: #2153B0; } 
+a:hover, a:focus { color: #173A7B; } 
+a img { border: 0; }
+
+#header { background: #c5daee; border-bottom: 4px solid #a3bfde; }
+#header a { display: block; margin: 0; padding: 15px; font-size: 2em; font-family:'Lucida Grande'; letter-spacing: 5px; text-decoration: none; text-shadow: #1659ac 1px 1px 3px; font-weight: bold; }
+
+/* Menu */
+#menu { margin: 0 0 15px; }
+#menu ul { list-style: none; padding: 0; margin: 0; background: #ececec; }
+#menu li { display: inline; margin: 0; padding:0; }
+#menu li a { display: table-cell; display: inline-block; padding: 5px 10px; text-decoration: none; margin: 0; }
+#menu li a:hover { background: #9f9f9f; color: #fefefe; }
+#menu li a:active { color: #ffcc64; } /*#cbddff*/
+#menu li.right {float:right;}
+
+/* Contenu de la page */
+#content { margin: 0 20px 30px; clear: both; }
+#content a[href^="http://"] { background: url(external.png) center right no-repeat; padding-right: 13px; }
+.categories { border: 1px solid #AAA; background: #F9F9F9; clear: both; margin-top: 1.5em; padding: 5px; }
+
+/* Pied de page */
+#footer { margin: 10px 0 0; padding: 7px 10px 0; background: #efefef; height: 22px; border-top: 1px solid #dcdcdc; }
+#footer #copyright { float: right; width: 150px; text-align:right; }
+
+/* Formatage des erreurs */
+.erreur 			{ font-weight: bold; color: #CC0000; }
+.bloc-erreur { background: #FFDBDB; border: 1px solid #BB7070; margin: 0.2em 0px; padding: 0.5em 0.9em; }
+h1 + .bloc-erreur { margin-top: 1em; }
+
+/* Mise en page des pages */
+.dernmodif { font-size: 0.8em; text-align: center; color: #888A85; margin: 0; padding-top: 3px; }
+.redirect .descr { color: #7d7d7d; font-size: x-small; margin-top: 3px; padding-left: 20px; }
+.redirect .link { font-size: large; }
+
+/* Connexion */
+.bloc_connexion { text-align: right; width: 320px; margin-top: 10px; }
+.bloc_admin, .lien_connexion { width: 150px; margin: 0; float: left; }
+.bloc_admin	{ width: 350px; }
+
+/* Formulaires */
+fieldset 			{ margin: 10px 0 20px 0; padding: 5px 10px 10px; border: 2px solid #e3e7ec; }
+fieldset p 			{ margin: 0; padding: 12px 0 2px 0; color: #666666;}
+input, textarea 	{ border: 1px solid #808080; background: #F3F3F3; }
+textarea 			{ width: 80%; }
+input 				{ margin: 0 8px 0 0; padding: 2px; }
+.submit 			{ padding: 2px 10px; }
+.submit:hover		{ border-color: #c87b02; }
+.formulaire_modif 	{ width: 100%; margin-top: 10px; }
+.center 			{ text-align: center; }
+.previsualisation 	{ margin-top: 20px; }
+.previsualisation h6 { background: #e3e7ec; font-size: 1em; padding: 5px; }
+
+/* Titres */
+h1, h2, h3, h4, h5, h6 { font-weight: normal; margin: 0; padding-top: .5em; padding-bottom: .17em; border-bottom: 1px solid #aaa; }
+h1 { font-size: 188%; padding-top: 0; border-bottom: 3px double #aaa; }
+h2 { font-size: 150%; }
+h3, h4, h5, h6 { border-bottom: none; font-weight: bold; }
+h3 { font-size: 132%; }
+h4 { font-size: 116%; }
+h5 { font-size: 100%; }
+
+blockquote { margin-left:2em;border: 1px dotted #aaa;padding: 3px; background: #fafcfe; padding-top:0;padding-bottom:0;}
+code { background-color: #f9f6e0; font-family: 'courier new', courier, monospace; font-size: 1em; }
+pre { font-size: 1.2em; background: #F9F9F9; border: 1px dashed #2F6FAB; padding: 1em; }
+
+dt { font-weight: bold; margin-bottom: .1em; }
+dl { margin-top: .2em; margin-bottom: .5em; }
+dd { line-height: 1.5em; margin-left: 2em; margin-bottom: .1em; }
+
+table { border: 1px solid #2c485c; border-collapse:collapse; }
+table th { background: #808080; text-align: center; color: #fff; }
+table td, table th { padding: 4px; }
+
+table.diff { border-spacing: 4px; width: 100%; }
+td.diff-context { background-color: #fafafa; }
+td.diff-deletedline { background-color: #ffa; width: 50%; }
+td.diff-addedline { background-color: #afa; width: 50%; }
+span.diffchange { color: #f00; font-weight: bold; }
+table.diff col.diff-marker { width: 1.4em; }
+table.diff col.diff-content { width: 50%; }
+table.diff td div { overflow: auto; padding: 0.1ex 0.5em; word-wrap: break-word; }
+table.diff td { padding: 0.1ex 0.4em; }
+
+/* Sommaire */
+.toc { border: 1px solid #AAA; padding: 3px; float: right; margin:1.2em 0 0 2em; background: #F9F9F9; width: 350px; }
+.toctitle { text-align: center; margin: 5px 0; font-weight: bold; }
+.toctitle .toctoggle { font-weight: normal; font-size: 80%; }
+.toc ol { padding-left: 30px; }
