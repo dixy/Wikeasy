@@ -242,7 +242,7 @@ elseif ($mode == 'parametres')
 		if (verify_nonce('modify-configuration', $_POST['_cfgnonce']))
 		{
 			if (!empty($_POST['config']['motdepasse']) && strlen(trim($_POST['config']['motdepasse'])) >= 6)
-				config_item('motdepasse', hash('sha256', $_POST['config']['motdepasse']));
+				config_item('motdepasse', hash('sha256', config_item('salt').$_POST['config']['motdepasse']));
 			
 			if (empty($_POST['config']['theme']) || !in_array($_POST['config']['theme'], $liste_themes))
 				$_POST['config']['theme'] = config_item('theme');
@@ -259,7 +259,6 @@ elseif ($mode == 'parametres')
 			elseif (config_item('pageurl_type') == 'normal' && is_file(PATH.'.htaccess'))
 				rename(PATH.'.htaccess', PATH.'htaccess.txt');
 			
-			config_item('salt', uniqid(mt_rand(), TRUE));
 			$contenu_config = '<?php $config = '.var_export(config_item(), TRUE).'; ?>';
 			
 			if (write_file(PATH_CNT.'config.php', $contenu_config))
