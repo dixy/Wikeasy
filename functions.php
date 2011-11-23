@@ -319,9 +319,6 @@ function parsewiki($text)
 			   htmlspecialchars($r[1]).'</a></p></div>';
 	}
 	
-	//if (preg_match('`//Cat[eé]gorie:([^/]+)//`iu', $text))
-	//	$text = trim(preg_replace('`//Cat[eé]gorie:([^/]+)//`iu', '', $text));
-	
 	$wiki = new WikiRenderer();
 	return $wiki->render($text);
 }
@@ -346,8 +343,10 @@ function pageurl($normal, $rewrite = '')
  */
 function save_last_change($pagetitle, $namespace = '', $version = 0, $special = array())
 {
-	if (!is_file(PATH_CNT.'modifications_recentes.php')) $recentchanges = array();
-	else require PATH_CNT.'modifications_recentes.php';
+	if (!is_file(PATH_CNT.'modifications_recentes'))
+		$recentchanges = array();
+	else
+		$recentchanges = unserialize(file_get_contents(PATH_CNT.'modifications_recentes'));
 	
 	$time = time();
 	
@@ -362,13 +361,12 @@ function save_last_change($pagetitle, $namespace = '', $version = 0, $special = 
 	elseif (isset($special['delete'])) $new['delete'] = TRUE;
 	elseif (isset($special['undelete'])) $new['undelete'] = TRUE;
 	
-	$recentchanges[] = $new;
+	array_unshift($recentchanges, $new);
 	
 	if (count($recentchanges) > config_item('nombre_modifs_recentes'))
-		array_shift($recentchanges);
+		array_pop($recentchanges);
 	
-	write_file(PATH_CNT.'modifications_recentes.php', 
-		'<?php $recentchanges = '.var_export($recentchanges, TRUE).';');
+	write_file(PATH_CNT.'modifications_recentes', serialize($recentchanges));
 }
 
 /**

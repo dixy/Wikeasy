@@ -122,6 +122,15 @@ function up_04_to05()
 	mkdir(PATH_PG.'Catégorie', 0777);
 	mkdir(PATH_CNT.'historique/Principal', 0777);
 	mkdir(PATH_CNT.'historique/Catégorie', 0777);
+	
+	$recentchanges = array();
+	if (is_file(PATH_CNT.'modifications_recentes.php'))
+		require PATH_CNT.'modifications_recentes.php';
+	$recentchanges = array_reverse($recentchanges);
+	foreach ($recentchanges as &$c)
+		if (!isset($c['namespace']))
+			$c['namespace'] = 'Principal';
+	write_file(PATH_CNT.'modifications_recentes', serialize($recentchanges));
 }
 
 /*

@@ -149,7 +149,19 @@ if ($mode == 'modifier')
 		{
 			if (!empty($_POST['contenu_page']) && mb_strlen(trim($_POST['contenu_page'])) >= 1)
 			{
-				if (!empty($_POST['previ_page']))
+				if (!empty($_POST['ajout_categorie']))
+				{
+				    if (!empty($_POST['article_categorie']))
+				    {
+				        if (!isset($categories[$_POST['article_categorie']]))
+				        {
+				            
+				        }
+				        else $erreur = 'La catégorie choisie n\'existe pas.';
+				    }
+				    else $erreur = 'Vous devez choisir une catégorie.';
+				}
+				elseif (!empty($_POST['previ_page']))
 					$apercu_page = parsewiki($_POST['contenu_page']);
 				elseif (!empty($_POST['enreg_page']))
 				{
@@ -337,10 +349,8 @@ elseif ($mode == 'modifications-recentes')
 	set_title('Modifications récentes');
 	
 	$recentchanges = array();
-	if (is_file(PATH_CNT.'modifications_recentes.php'))
-		require PATH_CNT.'modifications_recentes.php';
-	
-	$recentchanges = array_reverse($recentchanges);
+	if (is_file(PATH_CNT.'modifications_recentes'))
+		$recentchanges = unserialize(file_get_contents(PATH_CNT.'modifications_recentes'));
 }
 elseif ($mode == 'renommer')
 {
