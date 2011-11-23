@@ -129,7 +129,7 @@ if ($mode == 'modifier')
 	
 	if (check_access($page))
 	{
-		set_title((isset($page['page_exists']) ? 'Modification' : 'Création').' de "'.$page['title'].'"');
+		set_title(($page['page_exists'] ? 'Modification' : 'Création').' de "'.$page['title'].'"');
 		$categories = cache_categories();
 		
 		if (!empty($_GET['r']))
@@ -162,8 +162,8 @@ if ($mode == 'modifier')
 					{
 						if (isset($categories[$_POST['ajout_cat_nom']]))
 						{
-							if (!in_array($_POST['ajout_cat_nom'], $page_cats))
-								$page_cats[] = $_POST['ajout_cat_nom'];
+							if (!in_array($_POST['ajout_cat_nom'], $page['categories']))
+								$page['categories'][] = $_POST['ajout_cat_nom'];
 						}
 						else
 							$erreur = 'La catégorie choisie n\'existe pas.';
@@ -181,6 +181,8 @@ if ($mode == 'modifier')
 					
 					if (create_file($page, $namespace))
 					{
+						if ($namespace == 'Catégorie' || $namespace == 'Categorie')
+							cache_categories(CREATE_CACHE);
 						generate_cache_list($namespace);
 						redirect($page['pageurl'].(isset($page['redirect']) ? pageurl('&', '?').'redirect=no' : ''));
 					}
@@ -270,7 +272,7 @@ elseif ($mode == 'parametres')
 }
 elseif ($mode == 'supprimer')
 {
-	if (!isset($page['page_exists'])) redirect($page['pageurl']);
+	if (!$page['page_exists']) redirect($page['pageurl']);
 	
 	if (!empty($_POST['suppr_ok']) && !empty($_POST['_delnonce']))
 	{
@@ -313,7 +315,7 @@ elseif ($mode == 'liste')
 }
 elseif ($mode == 'historique')
 {
-	if (!isset($page['page_exists']))
+	if (!$page['page_exists'])
 		redirect($page['pageurl']);
 	
 	set_title('Historique des versions de « '.$page['title'].' »');
@@ -363,7 +365,7 @@ elseif ($mode == 'modifications-recentes')
 }
 elseif ($mode == 'renommer')
 {
-	if (!isset($page['page_exists']))
+	if (!$page['page_exists'])
 		redirect($page['pageurl']);
 	
 	if (!empty($_POST['page_newtitle']) && !empty($_POST['_rennonce']))
@@ -481,7 +483,7 @@ elseif ($mode == 'lire')
 		redirect(base_path().pageurl($page['redirect']));
 	}
 	
-	if (!isset($page['page_exists']))
+	if (!$page['page_exists'])
 	{
 		header('HTTP/1.1 404 Not Found');
 		$was_deleted = array_key_exists($page['name'], deleted_articles());

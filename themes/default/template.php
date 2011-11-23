@@ -17,10 +17,10 @@
 				<li><a href="<?php echo base_path(); ?>index.php?a=liste" accesskey="l">Liste des pages</a></li>
 				<li><a href="<?php echo base_path(); ?>index.php?a=modifications-recentes">Modifications récentes</a></li>
 				
-				<?php if ($_SESSION['wik_connect'] && ($mode == 'lire' || $mode == 'modifier' || $mode == 'historique') && isset($page['page_exists'])) : ?><li class="right"><a href="<?php echo $page['pageurl'].$and.'a=supprimer'; ?>" accesskey="s">Supprimer</a></li>
+				<?php if ($_SESSION['wik_connect'] && ($mode == 'lire' || $mode == 'modifier' || $mode == 'historique') && $page['page_exists']) : ?><li class="right"><a href="<?php echo $page['pageurl'].$and.'a=supprimer'; ?>" accesskey="s">Supprimer</a></li>
 				<li class="right"><a href="<?php echo $page['pageurl'].$and.'a=renommer'; ?>" accesskey="r">Renommer</a></li><?php endif; ?>
-				<?php if (($mode == 'modifier' || $mode == 'lire' || $mode == 'historique') && isset($page['page_exists'])) : ?><li class="right"><a href="<?php echo $page['pageurl'].$and.'a=historique'; ?>" accesskey="h">Historique</a></li><?php endif; ?>
-				<?php if (($mode == 'lire' || $mode == 'historique') && (check_access($page) || isset($page['page_exists']))) : ?><li class="right"><a href="<?php echo $page['pageurl'].$and.'a=modifier'; ?>" accesskey="m"><?php if (check_access($page)) : echo (isset($page['page_exists']) ? 'Modifier cet article' : 'Créer cet article'); else : echo 'Texte source'; endif; ?></a></li><?php endif; ?>
+				<?php if (($mode == 'modifier' || $mode == 'lire' || $mode == 'historique') && $page['page_exists']) : ?><li class="right"><a href="<?php echo $page['pageurl'].$and.'a=historique'; ?>" accesskey="h">Historique</a></li><?php endif; ?>
+				<?php if (($mode == 'lire' || $mode == 'historique') && (check_access($page) || $page['page_exists'])) : ?><li class="right"><a href="<?php echo $page['pageurl'].$and.'a=modifier'; ?>" accesskey="m"><?php if (check_access($page)) : echo ($page['page_exists'] ? 'Modifier cet article' : 'Créer cet article'); else : echo 'Texte source'; endif; ?></a></li><?php endif; ?>
 
 			</ul>
 		</div>
@@ -28,7 +28,7 @@
 		<div id="content">
 		<?php if ($mode == 'lire') : ?>
 			<h1><?php echo ($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$page['title']; ?></h1>
-			<?php if (isset($page['page_exists'])) : ?>
+			<?php if ($page['page_exists']) : ?>
 				<?php echo $page['content']; ?>
 				
 				<?php if (!empty($page['categories'])) : ?>
@@ -52,7 +52,7 @@
 			<?php endif; ?>
 		<?php elseif ($mode == 'modifier') : ?>
 			<?php if (check_access($page)) : ?>
-			<h1><?php echo (isset($page['page_exists']) ? 'Modification' : 'Création'); ?> de <?php echo $page['title']; ?></h1>
+			<h1><?php echo ($page['page_exists'] ? 'Modification' : 'Création'); ?> de <?php echo $page['title']; ?></h1>
 			
 			<form method="post" action="<?php echo $page['pageurl'].$and.'a=modifier'; ?>">
 				<?php if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>

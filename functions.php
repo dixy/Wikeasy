@@ -106,9 +106,6 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if (!$noparse)
 		$page['content'] = parsewiki($page['content']);
 	
-	if ($ns == 'Catégorie' || $ns == 'Categorie')
-		cache_categories(CREATE_CACHE);
-	
 	return write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
 }
 
