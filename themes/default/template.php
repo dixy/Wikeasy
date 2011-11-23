@@ -40,9 +40,9 @@
 				<?php endif; ?>
 			<?php else : ?>
 				<?php if ($was_deleted) : ?>
-					<div class="bloc-erreur">
+					<p class="avertissement">
 						Cet article a été supprimé.
-					</div>
+					</p>
 				<?php endif; ?>
 				<p>
 					Cet article n'existe pas.

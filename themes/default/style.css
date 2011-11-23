@@ -28,9 +28,20 @@ a img { border: 0; }
 #footer #copyright { float: right; width: 150px; text-align:right; }
 
 /* Formatage des erreurs */
-.erreur 			{ font-weight: bold; color: #CC0000; }
-.bloc-erreur { background: #FFDBDB; border: 1px solid #BB7070; margin: 0.2em 0px; padding: 0.5em 0.9em; }
-h1 + .bloc-erreur { margin-top: 1em; }
+.erreur, .avertissement {
+    background: url(exclamation.png) 8px 50% no-repeat;
+    background-color: #FFE3E3;
+    border: 2px solid #D00;
+    color: #800;
+    padding: 7px 4px 7px 30px;
+    margin-bottom: 12px;
+}
+
+.avertissement {
+    background-color: #FFEBC1;
+    color: #A6750C;
+    border-color: #FDBF3B;
+}
 
 /* Mise en page des pages */
 .dernmodif { font-size: 0.8em; text-align: center; color: #888A85; margin: 0; padding-top: 3px; }
