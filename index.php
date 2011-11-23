@@ -93,7 +93,7 @@ if (in_array($mode, array('lire', 'modifier', 'supprimer', 'historique', 'renomm
 		if (preg_match('`^[[:alpha:]]{2,}$`u', mb_substr($cleaned_title, 0, mb_strpos($cleaned_title, ':')), $ns))
 		{
 			if (!is_dir(PATH_PG.$ns[0]))
-				show_error('Cette catégorie n\'existe pas.');
+				show_error('Cet espace de nom n\'existe pas.');
 			else
 			{
 				$namespace = $ns[0];
@@ -378,18 +378,18 @@ elseif ($mode == 'renommer')
 			
 			if (mb_strlen($new_name) >= 2 && mb_strlen($new_name) <= 64)
 			{
-				if (!is_file(PATH_PG.$new_name.'.txt'))
+				if (!is_file(PATH_PG.$namespace.'/'.$new_name.'.txt'))
 				{
 					$oldpage = $page;
 					
-					$t1 = rename(PATH_CNT.'historique/'.$page['name'], PATH_CNT.'historique/'.$new_name);
-					$t2 = rename(PATH_PG.$page['name'].'.txt', PATH_PG.$new_name.'.txt');
+					$t1 = rename(PATH_CNT.'historique/'.$namespace.'/'.$page['name'], PATH_CNT.'historique/'.$namespace.'/'.$new_name);
+					$t2 = rename(PATH_PG.$namespace.'/'.$page['name'].'.txt', PATH_PG.$namespace.'/'.$new_name.'.txt');
 					
 					if ($t1 && $t2)
 					{
 						$page['name'] = $new_name;
 						$page['title'] = art_title($new_name);
-						create_file($page, TRUE, FALSE);
+						create_file($page, $namespace, TRUE, FALSE);
 						
 						$oldpage['lastversion'] = 0;
 						$oldpage['content'] = '#REDIRECT [['.$page['title'].']]';
@@ -398,7 +398,7 @@ elseif ($mode == 'renommer')
 						save_last_change($page['title'], $namespace, 0, array('oldname' => $oldpage['title']));
 						
 						generate_cache_list($namespace);
-						redirect(base_path().pageurl(art_title2url($page['title'])));
+						redirect(base_path().pageurl(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').art_title2url($page['title'])));
 					} else $erreur = 'Erreur lors du renommage de l\'article.';
 				} else $erreur = 'Le nouveau titre choisi est déjà utilisé.';
 			} else $erreur = 'Le nouveau titre est soit trop court soit trop long (maximum 64 caractères).';
