@@ -18,6 +18,7 @@ define('VERSION', '0.5-dev');
 define('PATH', 		dirname(__FILE__).'/');
 define('PATH_CNT',	PATH.'content/');
 define('PATH_PG',	PATH_CNT.'pages/');
+define('PATH_CACHE',PATH_CNT.'cache/');
 
 
 /*
@@ -297,10 +298,10 @@ elseif ($mode == 'liste')
 	
 	$ns = config_item('namespace_defaut');
 	
-	if (!is_file(PATH_CNT.$ns.'_articles.php'))
+	if (!is_file(PATH_CACHE.$ns.'_articles.php'))
 		generate_cache_list($ns);
 	
-	require PATH_CNT.$ns.'_articles.php';
+	require PATH_CACHE.$ns.'_articles.php';
 }
 elseif ($mode == 'historique')
 {
@@ -349,8 +350,8 @@ elseif ($mode == 'modifications-recentes')
 	set_title('Modifications récentes');
 	
 	$recentchanges = array();
-	if (is_file(PATH_CNT.'modifications_recentes'))
-		$recentchanges = unserialize(file_get_contents(PATH_CNT.'modifications_recentes'));
+	if (is_file(PATH_CACHE.'modifications_recentes'))
+		$recentchanges = unserialize(file_get_contents(PATH_CACHE.'modifications_recentes'));
 }
 elseif ($mode == 'renommer')
 {
@@ -401,10 +402,10 @@ elseif ($mode == 'redirections')
 {
 	set_title('Liste des redirections');
 	
-	if (!is_file(PATH_CNT.'liste_redirections.php'))
+	if (!is_file(PATH_CACHE.'liste_redirections.php'))
 		generate_cache_list($namespace);
 	
-	require PATH_CNT.'liste_redirections.php';
+	require PATH_CACHE.'liste_redirections.php';
 }
 elseif ($mode == 'suppressions')
 {

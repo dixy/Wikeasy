@@ -212,7 +212,8 @@ function generate_cache_list($namespace)
 	
 	natcasesort($list_articles);
 		
-	write_file(PATH_CNT.$namespace.'_articles.php', '<?php $list_articles = '.var_export($list_articles, TRUE).';');
+	write_file(PATH_CACHE.$namespace.'_articles.php', 
+		'<?php $list_articles = '.var_export($list_articles, TRUE).';');
 }
 
 /**
@@ -240,6 +241,7 @@ function install()
 	if (is_writable($dossier))
 	{
 		mkdir($dossier.'/pages', 0777);
+		mkdir($dossier.'/cache', 0777);
 		mkdir($dossier.'/historique', 0777);
 		mkdir($dossier.'/suppressions', 0777);
 		mkdir($dossier.'/pages/Principal', 0777);
@@ -343,10 +345,10 @@ function pageurl($normal, $rewrite = '')
  */
 function save_last_change($pagetitle, $namespace = '', $version = 0, $special = array())
 {
-	if (!is_file(PATH_CNT.'modifications_recentes'))
+	if (!is_file(PATH_CACHE.'modifications_recentes'))
 		$recentchanges = array();
 	else
-		$recentchanges = unserialize(file_get_contents(PATH_CNT.'modifications_recentes'));
+		$recentchanges = unserialize(file_get_contents(PATH_CACHE.'modifications_recentes'));
 	
 	$time = time();
 	
@@ -366,7 +368,7 @@ function save_last_change($pagetitle, $namespace = '', $version = 0, $special = 
 	if (count($recentchanges) > config_item('nombre_modifs_recentes'))
 		array_pop($recentchanges);
 	
-	write_file(PATH_CNT.'modifications_recentes', serialize($recentchanges));
+	write_file(PATH_CACHE.'modifications_recentes', serialize($recentchanges));
 }
 
 /**
@@ -446,7 +448,7 @@ function generate_deleted_articles_cache()
 		closedir($dir);
 	}
 	
-	write_file(PATH_CNT.'liste_supprimes', serialize(array_flip($deleted)));
+	write_file(PATH_CACHE.'liste_supprimes', serialize(array_flip($deleted)));
 }
 
 /**
@@ -454,10 +456,10 @@ function generate_deleted_articles_cache()
  */
 function deleted_articles()
 {
-	if (!is_file(PATH_CNT.'liste_supprimes'))
+	if (!is_file(PATH_CACHE.'liste_supprimes'))
 		generate_deleted_articles_cache();
 	
-	return unserialize(file_get_contents(PATH_CNT.'liste_supprimes'));
+	return unserialize(file_get_contents(PATH_CACHE.'liste_supprimes'));
 }
 
 /**
@@ -511,12 +513,12 @@ function show_error($message, $heading = 'Erreur', $back_index = TRUE)
  */
 function cache_categories($create = FALSE)
 {
-    $file = PATH_CNT.'categories';
+    $file = PATH_CACHE.'categories';
     
     if ($create == CREATE_CACHE)
     {
         $cats = array();
-        $dir = dir(PATH_PG.'Catégorie');
+        $dir = dir(PATH_CACHE.'Catégorie');
         while (($cat = $dir->read()) !== FALSE)
         {
             if ($cat[0] != '.')

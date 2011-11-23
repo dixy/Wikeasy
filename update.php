@@ -118,6 +118,7 @@ function up_031_to_04() { mkdir(PATH_CNT.'suppressions', 0777); }
 
 function up_04_to05()
 {
+    mkdir(PATH_CNT.'cache', 0777);
 	mkdir(PATH_PG.'Principal', 0777);
 	mkdir(PATH_PG.'Catégorie', 0777);
 	mkdir(PATH_CNT.'historique/Principal', 0777);
