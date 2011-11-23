@@ -61,8 +61,14 @@
 					<textarea name="contenu_page" id="pg_cnt" cols="50" rows="25" tabindex="1"><?php echo htmlspecialchars($page_to_edit); ?></textarea>
 					
 					<div class="choix_categories">
-						Catégories : <span id="cats">(aucune)</span> 
-						<select name="article_categorie" id="article_categorie" tabindex="3">
+						Catégories : <span id="cats"><?php
+						if (empty($page_cats)) :
+							echo '(aucune)';
+						else :
+							echo implode(', ', array_map(function ($c) { return '<input type="hidden" name="categories_page[]" value="'.$c.'" />'.$c; }, $page_cats));
+						endif;
+						?></span> 
+						<select name="ajout_cat_nom" id="ajout_cat_nom" tabindex="3">
 							<option value="0"></option>
 							<?php foreach ($categories as $c_nom => $c_titre) : ?><option value="<?php echo $c_nom; ?>"><?php echo $c_titre; ?></option>
 							<?php endforeach; ?>

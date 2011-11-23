@@ -112,7 +112,7 @@ if (in_array($mode, array('lire', 'modifier', 'supprimer', 'historique', 'renomm
 
 if (!$_SESSION['wik_connect'] && in_array($mode, array('parametres', 'deconnexion', 'supprimer', 'renommer', 'suppressions')))
 {
-    header('HTTP/1.1 401 Unauthorized');
+	header('HTTP/1.1 401 Unauthorized');
 	redirect(base_path().'index.php?a=connexion');
 }
 
@@ -150,23 +150,32 @@ if ($mode == 'modifier')
 		{
 			if (!empty($_POST['contenu_page']) && mb_strlen(trim($_POST['contenu_page'])) >= 1)
 			{
+				$page_cats = array();
+				if (!empty($_POST['categories_page']) && is_array($_POST['categories_page']))
+					$page_cats = array_unique(array_filter($_POST['categories_page'], 
+						function ($c) use ($categories) { return isset($categories[$c]); }));
+				
+				
 				if (!empty($_POST['ajout_categorie']))
 				{
-				    if (!empty($_POST['article_categorie']))
-				    {
-				        if (!isset($categories[$_POST['article_categorie']]))
-				        {
-				            
-				        }
-				        else $erreur = 'La catégorie choisie n\'existe pas.';
-				    }
-				    else $erreur = 'Vous devez choisir une catégorie.';
+					if (!empty($_POST['ajout_cat_nom']))
+					{
+						if (isset($categories[$_POST['ajout_cat_nom']]))
+						{
+							if (!in_array($_POST['ajout_cat_nom'], $page_cats))
+								$page_cats[] = $_POST['ajout_cat_nom'];
+						}
+						else
+							$erreur = 'La catégorie choisie n\'existe pas.';
+					}
+					else $erreur = 'Vous devez choisir une catégorie.';
 				}
 				elseif (!empty($_POST['previ_page']))
 					$apercu_page = parsewiki($_POST['contenu_page']);
 				elseif (!empty($_POST['enreg_page']))
 				{
 					$page['content'] = trim($_POST['contenu_page']);
+					$page['categories'] = $page_cats;
 					
 					if ($_SESSION['wik_connect'])
 						$page['status'] = !empty($_POST['change_status']) ? 'private' : 'public';
@@ -430,9 +439,9 @@ elseif ($mode == 'suppressions')
 			{
 				if (verify_nonce('undelete-page', $_POST['_undelnonce']))
 				{
-				    $new_title = !empty($_POST['new_title']) ? clean_title($_POST['new_title']) : '';
-				    $act = $_POST['undel_act'] == 'delete' ? 'delete' : 'new';
-				    
+					$new_title = !empty($_POST['new_title']) ? clean_title($_POST['new_title']) : '';
+					$act = $_POST['undel_act'] == 'delete' ? 'delete' : 'new';
+					
 					if ($check_exists || (($act == 'new' && !empty($new_title) && !is_file(PATH_PG.$new_title.'.xml')) || $act == 'delete'))
 					{
 						if ($check_exists && $act == 'delete')

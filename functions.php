@@ -89,7 +89,7 @@ function get_page($nom, $namespace = '')
 		$return['page_exists'] = TRUE;
 		
 		if (isset($index_tags['categories']))
-			$return['categories'] = explode('|', $valeurs[$index_tags['categories'][0]]['value']);
+			$return['categories'] = unserialize($valeurs[$index_tags['categories'][0]]['value']);
 		
 		if (isset($index_tags['redirectto']))
 			$return['redirect'] = $valeurs[$index_tags['redirectto'][0]]['value'];
@@ -117,9 +117,7 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 		if (preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $page['content'], $r))
 			$redirect = "\n\t".'<redirectto>'.art_title2url(clean_title($r[1])).'</redirectto>';
 	
-	$categories = '';
-	//if (preg_match_all('`//Cat[eé]gorie:([^/]+)//`iu', $page['content'], $cats))
-	//	$categories = "\n\t".'<categories>'.implode('|', array_map('clean_title', $cats[1])).'</categories>';
+	$categories = "\n\t".'<categories>'.serialize($page['categories']).'</categories>';
 	
 	$fichier_contenu = '<?xml version="1.0" encoding="UTF-8"?>
 <document>
