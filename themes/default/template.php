@@ -62,10 +62,10 @@
 					
 					<div class="choix_categories">
 						Catégories : <span id="cats"><?php
-						if (empty($page_cats)) :
+						if (empty($page['categories'])) :
 							echo '(aucune)';
 						else :
-							echo implode(', ', array_map(function ($c) { return '<input type="hidden" name="categories_page[]" value="'.$c.'" />'.$c; }, $page_cats));
+							echo implode(', ', array_map(function ($c) { return '<input type="hidden" name="categories_page[]" value="'.$c.'" />'.$c; }, $page['categories']));
 						endif;
 						?></span> 
 						<select name="ajout_cat_nom" id="ajout_cat_nom" tabindex="3">

@@ -150,9 +150,9 @@ if ($mode == 'modifier')
 		{
 			if (!empty($_POST['contenu_page']) && mb_strlen(trim($_POST['contenu_page'])) >= 1)
 			{
-				$page_cats = array();
+				$page['categories'] = array();
 				if (!empty($_POST['categories_page']) && is_array($_POST['categories_page']))
-					$page_cats = array_unique(array_filter($_POST['categories_page'], 
+					$page['categories'] = array_unique(array_filter($_POST['categories_page'], 
 						function ($c) use ($categories) { return isset($categories[$c]); }));
 				
 				
@@ -175,7 +175,6 @@ if ($mode == 'modifier')
 				elseif (!empty($_POST['enreg_page']))
 				{
 					$page['content'] = trim($_POST['contenu_page']);
-					$page['categories'] = $page_cats;
 					
 					if ($_SESSION['wik_connect'])
 						$page['status'] = !empty($_POST['change_status']) ? 'private' : 'public';
@@ -287,7 +286,7 @@ elseif ($mode == 'supprimer')
 			if (write_file(PATH_CNT.'suppressions/'.$page['name'], serialize($pagedeleted)))
 			{
 				delete_history($page['name'], $namespace);
-				unlink(PATH_PG.$namespace.'/'.$page['name'].'.xml');
+				unlink(PATH_PG.$namespace.'/'.$page['name'].'.txt');
 				
 				save_last_change($page['title'], $namespace, 0, array('delete' => 1));
 				generate_cache_list($namespace);
@@ -378,12 +377,12 @@ elseif ($mode == 'renommer')
 			
 			if (mb_strlen($new_name) >= 2 && mb_strlen($new_name) <= 64)
 			{
-				if (!is_file(PATH_PG.$new_name.'.xml'))
+				if (!is_file(PATH_PG.$new_name.'.txt'))
 				{
 					$oldpage = $page;
 					
 					$t1 = rename(PATH_CNT.'historique/'.$page['name'], PATH_CNT.'historique/'.$new_name);
-					$t2 = rename(PATH_PG.$page['name'].'.xml', PATH_PG.$new_name.'.xml');
+					$t2 = rename(PATH_PG.$page['name'].'.txt', PATH_PG.$new_name.'.txt');
 					
 					if ($t1 && $t2)
 					{
@@ -433,7 +432,7 @@ elseif ($mode == 'suppressions')
 			set_title('Restaurer une page supprimée');
 			
 			$undelete = $pages_deleted[$_GET['r']];
-			$check_exists = is_file(PATH_PG.$_GET['r'].'.xml');
+			$check_exists = is_file(PATH_PG.$_GET['r'].'.txt');
 			
 			if (!empty($_POST['_undelnonce']) && !empty($_POST['undelete_ok']) && !empty($_POST['undel_act']))
 			{
@@ -442,7 +441,7 @@ elseif ($mode == 'suppressions')
 					$new_title = !empty($_POST['new_title']) ? clean_title($_POST['new_title']) : '';
 					$act = $_POST['undel_act'] == 'delete' ? 'delete' : 'new';
 					
-					if ($check_exists || (($act == 'new' && !empty($new_title) && !is_file(PATH_PG.$new_title.'.xml')) || $act == 'delete'))
+					if ($check_exists || (($act == 'new' && !empty($new_title) && !is_file(PATH_PG.$new_title.'.txt')) || $act == 'delete'))
 					{
 						if ($check_exists && $act == 'delete')
 							delete_history($_GET['r'], $namespace, FALSE);

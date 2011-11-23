@@ -63,36 +63,17 @@ function get_page($nom, $namespace = '')
 		'status' => 'public',
 		'lastmodif' => '',
 		'lastversion' => 0,
-		'categories' => array()
+		'categories' => array(),
+		'page_exists' => FALSE
 	);
 	
-	$nom_fichier = PATH_PG.$namespace.'/'.$nom.'.xml';
+	$nom_fichier = PATH_PG.$namespace.'/'.$nom.'.txt';
 	if (is_file($nom_fichier))
 	{
-		$handle = fopen($nom_fichier, 'r');
-		$contenu_fichier = fread($handle, filesize($nom_fichier));
-		fclose($handle);
-		
-		$parser = xml_parser_create('UTF-8');
-		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
-		xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 0);
-		xml_parse_into_struct($parser, $contenu_fichier, $valeurs, $index_tags);
-		xml_parser_free($parser);
-		
-		$return['name'] = $nom;
-		$return['title'] = $valeurs[$index_tags['title'][0]]['value'];
-		$return['content'] = trim($valeurs[$index_tags['content'][0]]['value']);
-		$return['lastmodif'] = $valeurs[$index_tags['lastmodif'][0]]['value'];
-		$return['status'] = $valeurs[$index_tags['status'][0]]['value'];
-		$return['lastversion'] = (int)$valeurs[$index_tags['lastversion'][0]]['value'];
-		$return['pageurl'] = base_path().pageurl(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').art_title2url($return['title']));
+		$return = unserialize(file_get_contents($nom_fichier));
 		$return['page_exists'] = TRUE;
-		
-		if (isset($index_tags['categories']))
-			$return['categories'] = unserialize($valeurs[$index_tags['categories'][0]]['value']);
-		
-		if (isset($index_tags['redirectto']))
-			$return['redirect'] = $valeurs[$index_tags['redirectto'][0]]['value'];
+		$return['pageurl'] = base_path().pageurl(($namespace != config_item('namespace_defaut')
+									? $namespace.':' : '').art_title2url($return['title']));
 	}
 	
 	return $return;
@@ -110,34 +91,25 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if (!is_dir(PATH_CNT.'historique/'.$ns.'/'.$page['name']))
 		mkdir(PATH_CNT.'historique/'.$ns.'/'.$page['name'], 0777);
 	
-	$page['content'] = str_replace(array('<![CDATA[', ']]>'), array('&lt;![CDATA[', ']]&gt;'), $page['content']);
-	
 	$redirect = '';
 	if (substr($page['content'], 0, 9) == '#REDIRECT')
 		if (preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $page['content'], $r))
-			$redirect = "\n\t".'<redirectto>'.art_title2url(clean_title($r[1])).'</redirectto>';
-	
-	$categories = "\n\t".'<categories>'.serialize($page['categories']).'</categories>';
-	
-	$fichier_contenu = '<?xml version="1.0" encoding="UTF-8"?>
-<document>
-	<title>'.$page['title'].'</title>
-	<content><![CDATA['.(!$noparse ? parsewiki($page['content']) : $page['content']).']]></content>
-	<lastmodif>'.date('d/m/Y à H:i').'</lastmodif>
-	<status>'.$page['status'].'</status>
-	<lastversion>'.($createrevision ? $page['lastversion']+1 : $page['lastversion']).'</lastversion>'.$categories.$redirect.'
-</document>';
+			$page['redirect'] = art_title2url(clean_title($r[1]));
 	
 	if ($createrevision)
 	{
+		$page['lastversion'] += 1;
 		if ($savelast) save_last_change($page['title'], $ns, $page['lastversion'] + 1);
-		write_file(PATH_CNT.'historique/'.$ns.'/'.$page['name'].'/'.($page['lastversion'] + 1).'.txt', $page['content']);
+		write_file(PATH_CNT.'historique/'.$ns.'/'.$page['name'].'/'.$page['lastversion'].'.txt', $page['content']);
 	}
+	
+	if (!$noparse)
+		$page['content'] = parsewiki($page['content']);
 	
 	if ($ns == 'Catégorie' || $ns == 'Categorie')
 		cache_categories(CREATE_CACHE);
 	
-	return write_file(PATH_PG.$ns.'/'.$page['name'].'.xml', $fichier_contenu);
+	return write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
 }
 
 /**
@@ -189,24 +161,17 @@ function generate_cache_list($namespace)
 {
 	$list_articles = array();
 	
-	$dossier = opendir(PATH_PG.$namespace);
-	while ($page = readdir($dossier))
+	$dossier = dir(PATH_PG.$namespace);
+	while (($page = $dossier->read()) !== FALSE)
 	{
 		if ($page[0] != '.')
 		{
-			$fichier_page = fopen(PATH_PG.$namespace.'/'.$page, 'r');
-			$contenu_page = fread($fichier_page, filesize(PATH_PG.$namespace.'/'.$page));
-			fclose($fichier_page);
-			
-			$pos_title = strpos($contenu_page, '<title>');
-			$pos_title_end = strpos($contenu_page, '</title>', $pos_title);
-			$titre_page = substr($contenu_page, $pos_title + 7, $pos_title_end - ($pos_title + 7));
-			
-			if (strpos($contenu_page, '<redirectto>') === FALSE)
-				$list_articles[] = $titre_page;
+			$contenu_page = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$page));
+			if (!isset($contenu_page['redirect']))
+				$list_articles[] = $contenu_page['title'];
 		}
 	}
-	closedir($dossier);
+	$dossier->close();
 	
 	natcasesort($list_articles);
 		
