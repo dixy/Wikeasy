@@ -99,7 +99,7 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if ($createrevision)
 	{
 		$page['lastversion'] += 1;
-		if ($savelast) save_last_change($page['title'], $ns, $page['lastversion'] + 1);
+		if ($savelast) save_last_change($page['title'], $ns, $page['lastversion']);
 		write_file(PATH_CNT.'historique/'.$ns.'/'.$page['name'].'/'.$page['lastversion'].'.txt', $page['content']);
 	}
 	
