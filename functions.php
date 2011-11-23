@@ -86,7 +86,7 @@ function get_page($nom, $namespace = '')
 		$return['status'] = $valeurs[$index_tags['status'][0]]['value'];
 		$return['lastversion'] = (int)$valeurs[$index_tags['lastversion'][0]]['value'];
 		$return['pageurl'] = base_path().pageurl(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').art_title2url($return['title']));
-		$return['page_exists'] = true;
+		$return['page_exists'] = TRUE;
 		
 		if (isset($index_tags['categories']))
 			$return['categories'] = explode('|', $valeurs[$index_tags['categories'][0]]['value']);
@@ -118,8 +118,8 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 			$redirect = "\n\t".'<redirectto>'.art_title2url(clean_title($r[1])).'</redirectto>';
 	
 	$categories = '';
-	if (preg_match_all('`//Cat[eé]gorie:([^/]+)//`iu', $page['content'], $cats))
-		$categories = "\n\t".'<categories>'.implode('|', array_map('clean_title', $cats[1])).'</categories>';
+	//if (preg_match_all('`//Cat[eé]gorie:([^/]+)//`iu', $page['content'], $cats))
+	//	$categories = "\n\t".'<categories>'.implode('|', array_map('clean_title', $cats[1])).'</categories>';
 	
 	$fichier_contenu = '<?xml version="1.0" encoding="UTF-8"?>
 <document>
@@ -132,9 +132,12 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	
 	if ($createrevision)
 	{
-		if ($savelast) save_last_change($page['title'], $page['lastversion']+1);
-		write_file(PATH_CNT.'historique/'.$ns.'/'.$page['name'].'/'.($page['lastversion']+1).'.txt', $page['content']);
+		if ($savelast) save_last_change($page['title'], $ns, $page['lastversion'] + 1);
+		write_file(PATH_CNT.'historique/'.$ns.'/'.$page['name'].'/'.($page['lastversion'] + 1).'.txt', $page['content']);
 	}
+	
+	if ($ns == 'Catégorie' || $ns == 'Categorie')
+		cache_categories(CREATE_CACHE);
 	
 	return write_file(PATH_PG.$ns.'/'.$page['name'].'.xml', $fichier_contenu);
 }
@@ -240,11 +243,13 @@ function install()
 		mkdir($dossier.'/historique', 0777);
 		mkdir($dossier.'/suppressions', 0777);
 		mkdir($dossier.'/pages/Principal', 0777);
+		mkdir($dossier.'/pages/Catégorie', 0777);
 		mkdir($dossier.'/historique/Principal', 0777);
+		mkdir($dossier.'/historique/Catégorie', 0777);
 		$config = array(
 			'page_defaut' => 'Accueil', 'utilisateur' => 'admin', 'nom_wiki' => 'Wikeasy', 'theme' => 'default',
 			'motdepasse' => '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'pageurl_type' => 'normal', 
-			'salt' => uniqid(mt_rand(), true), 'version' => VERSION, 'nombre_modifs_recentes' => 50, 'proteger_pages' => 0,
+			'salt' => uniqid(mt_rand(), TRUE), 'version' => VERSION, 'nombre_modifs_recentes' => 50, 'proteger_pages' => 0,
 			'namespace_defaut' => 'Principal');
 		write_file($dossier.'/config.php', '<?php $config = '.var_export($config, TRUE).';');
 		create_file(array(
@@ -339,7 +344,7 @@ function pageurl($normal, $rewrite = '')
 /**
  *	Enregistre la modification qui vient d'être effectuée.
  */
-function save_last_change($pagetitle, $version = 0, $special = array())
+function save_last_change($pagetitle, $namespace = '', $version = 0, $special = array())
 {
 	if (!is_file(PATH_CNT.'modifications_recentes.php')) $recentchanges = array();
 	else require PATH_CNT.'modifications_recentes.php';
@@ -349,7 +354,8 @@ function save_last_change($pagetitle, $version = 0, $special = array())
 	$new = array(
 		'pagetitle' => $pagetitle,
 		'date' => format_date($time),
-		'hour' => date('H\hi', $time));
+		'hour' => date('H\hi', $time),
+		'namespace' => $namespace);
 	
 	if ($version > 0) $new['version'] = $version;
 	if (isset($special['oldname'])) $new['oldname'] = $special['oldname'];
@@ -385,7 +391,7 @@ function format_date($date, $hour = FALSE, $interval = FALSE)
 		elseif ($diff < 3600)
 			return 'il y a '.(int)date('i', $diff).' min';
 		elseif ($diff < 3600 * 2)
-			return 'il y a '.(int)date('h', $diff-3600).'h'.date('i', $diff);
+			return 'il y a '.(int)date('h', $diff - 3600).'h'.date('i', $diff);
 	}
 	
 	$j = date('j', $date);
@@ -503,22 +509,6 @@ function show_error($message, $heading = 'Erreur', $back_index = TRUE)
 }
 
 /**
- *  Création d'une nouvelle catégorie.
- *  
- *  @param string $name
- */
-function create_category($name)
-{
-    if (is_dir(PATH_PG.$name))
-        return FALSE;
-    
-    mkdir(PATH_PG.$name, 0777);
-    mkdir(PATH_CNT.'historique/'.$name, 0777);
-    
-    cache_categories(CREATE_CACHE);
-}
-
-/**
  *  Création du fichier de cache de la liste des catégories.
  */
 function cache_categories($create = FALSE)
@@ -528,10 +518,15 @@ function cache_categories($create = FALSE)
     if ($create == CREATE_CACHE)
     {
         $cats = array();
-        $dir = dir(PATH_PG);
+        $dir = dir(PATH_PG.'Catégorie');
         while (($cat = $dir->read()) !== FALSE)
-            if ($cat[0] != '.' && is_dir(PATH_PG.$cat))
-                $cats[] = $cat;
+        {
+            if ($cat[0] != '.')
+            {
+                $cat = substr($cat, 0, strpos($cat, '.'));
+                $cats[$cat] = art_title($cat);
+            }
+        }
         $dir->close();
         write_file($file, serialize($cats));
     }

@@ -62,9 +62,9 @@
 					
 					<div class="choix_categories">
 						Catégories : <span id="cats">(aucune)</span> 
-						<select name="article_categories" id="article_categories" tabindex="3">
+						<select name="article_categorie" id="article_categorie" tabindex="3">
 							<option value="0"></option>
-							<?php foreach ($categories as $c) : ?><option value="<?php echo $c; ?>"><?php echo $c; ?></option>
+							<?php foreach ($categories as $c_nom => $c_titre) : ?><option value="<?php echo $c_nom; ?>"><?php echo $c_titre; ?></option>
 							<?php endforeach; ?>
 
 						</select>
@@ -222,6 +222,7 @@
 				<p>Aucune modification pour l'instant.</p>
 			<?php else :
 				$dernier_jour = '';
+				$ns_default = config_item('namespace_defaut');
 				foreach ($recentchanges as $change)
 				{
 					if ($change['date'] != $dernier_jour)
@@ -231,8 +232,9 @@
 						$dernier_jour = $change['date'];
 					}
 					
+					$ns = $ns_default != $change['namespace'] ? $change['namespace'].':' : '';
 					$diff = 'diff'; $plus = ''; 
-					$pageurl = pageurl(art_title2url($change['pagetitle']));
+					$pageurl = pageurl($ns.art_title2url($change['pagetitle']));
 					$hist = '<a href="'.$pageurl.$and.'a=historique">hist</a>';
 					
 					if (isset($change['version']))
@@ -246,14 +248,14 @@
 					}
 					
 					if (isset($change['oldname'])) 
-						$what = '<a href="'.pageurl(art_title2url($change['oldname'])).$and.'redirect=no">'.$change['oldname'].'</a> '.
-								'renommé en <a href="'.$pageurl.'">'.$change['pagetitle'].'</a>';
+						$what = '<a href="'.pageurl($ns.art_title2url($change['oldname'])).$and.'redirect=no">'.$ns.$change['oldname'].'</a> '.
+								'renommé en <a href="'.$pageurl.'">'.$ns.$change['pagetitle'].'</a>';
 					elseif (isset($change['undelete']))
-						$what = 'Restauration de <a href="'.$pageurl.'">'.$change['pagetitle'].'</a>';
+						$what = 'Restauration de <a href="'.$pageurl.'">'.$ns.$change['pagetitle'].'</a>';
 					elseif (isset($change['delete']))
-						{ $what = 'Suppression de <a href="'.$pageurl.'">'.$change['pagetitle'].'</a>'; $hist = 'hist'; }
+						{ $what = 'Suppression de <a href="'.$pageurl.'">'.$ns.$change['pagetitle'].'</a>'; $hist = 'hist'; }
 					else
-						$what = '<a href="'.$pageurl.'">'.$change['pagetitle'].'</a>';
+						$what = '<a href="'.$pageurl.'">'.$ns.$change['pagetitle'].'</a>';
 					
 					echo '<li>('.$diff.') ('.$hist.') &nbsp;'.$what.' - '.$change['hour'].$plus.'</li>'."\n";
 				}
