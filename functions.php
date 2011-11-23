@@ -407,11 +407,11 @@ function delete_history($page, $namespace, $dirtoo = TRUE)
 	
 	if (!is_dir($path_dir)) return FALSE;
 	
-	$dir = opendir($path_dir);
-	while ($vers = readdir($dir))
+	$dir = dir($path_dir);
+	while (($vers = $dir->read()) !== FALSE)
 		if ($vers[0] != '.')
 			unlink($path_dir.'/'.$vers);
-	closedir($vers);
+	$dir->close();
 	
 	if ($dirtoo) rmdir($path_dir);
 	return is_dir($path_dir);
