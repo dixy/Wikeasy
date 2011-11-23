@@ -46,15 +46,17 @@ h1 + .bloc-erreur { margin-top: 1em; }
 fieldset 			{ margin: 10px 0 20px 0; padding: 5px 10px 10px; border: 2px solid #e3e7ec; }
 fieldset p 			{ margin: 0; padding: 12px 0 2px 0; color: #666666;}
 input, textarea 	{ border: 1px solid #808080; background: #F3F3F3; }
-textarea 			{ width: 99%; }
+textarea 			{ width: 100%; }
 input 				{ margin: 0 8px 0 0; padding: 2px; }
 input:focus, textarea:focus { outline-width: 0; }
+input[type=button]  { padding: 2px 5px; }
 .submit 			{ padding: 2px 10px; }
 .submit:hover		{ border-color: #c87b02; }
 .formulaire_modif 	{ width: 100%; margin-top: 10px; }
 .center 			{ text-align: center; }
 .previsualisation 	{ margin-top: 20px; }
 .previsualisation h6 { background: #e3e7ec; font-size: 1em; padding: 5px; }
+.choix_categories   { border-bottom: 1px solid #dcdcdc; padding: 0 0 4px; margin-bottom: 6px; }
 
 /* Titres */
 h1, h2, h3, h4, h5, h6 { font-weight: normal; margin: 0; padding-top: .5em; padding-bottom: .17em; border-bottom: 1px solid #aaa; }

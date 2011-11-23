@@ -58,18 +58,30 @@
 				<?php if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
 
 				<div class="formulaire_modif">
-					<textarea name="contenu_page" id="pg_cnt" cols="50" rows="25" style="width:100%;" tabindex="1"><?php echo htmlspecialchars($page_to_edit); ?></textarea><br />
+					<textarea name="contenu_page" id="pg_cnt" cols="50" rows="25" tabindex="1"><?php echo htmlspecialchars($page_to_edit); ?></textarea>
+					
+					<div class="choix_categories">
+						Catégories : <span id="cats">(aucune)</span> 
+						<select name="article_categories" id="article_categories" tabindex="3">
+							<option value="0"></option>
+							<?php foreach ($categories as $c) : ?><option value="<?php echo $c; ?>"><?php echo $c; ?></option>
+							<?php endforeach; ?>
+
+						</select>
+						<input type="submit" value="Ajouter" name="ajout_categorie" class="submit" accesskey="c" />
+					</div>
+					
 					<?php if ($_SESSION['wik_connect']) : ?>
 						<label for="change_status">
-							<input type="checkbox" id="change_status" name="change_status" tabindex="3" value="1" <?php if ($page['status'] == 'private') echo 'checked="checked" '; ?>/> 
+							<input type="checkbox" id="change_status" name="change_status" tabindex="5" value="1" <?php if ($page['status'] == 'private') echo 'checked="checked" '; ?>/> 
 							Empêcher la modification de cette page par les visiteurs
 						</label>
 					<?php endif; ?>
 
 					<p class="center">
-						<input type="submit" name="enreg_page" value="Enregistrer" class="submit" accesskey="e" tabindex="5" /> 
-						<input type="submit" name="previ_page" value="Prévisualiser" class="submit" accesskey="p" tabindex="10" /> 
-						<a href="<?php echo $page['pageurl'].(isset($page['redirect']) ? $and.'redirect=no' : ''); ?>" tabindex="15">Annuler</a>
+						<input type="submit" name="enreg_page" value="Enregistrer" class="submit" accesskey="e" tabindex="10" /> 
+						<input type="submit" name="previ_page" value="Prévisualiser" class="submit" accesskey="p" tabindex="12" /> 
+						<a href="<?php echo $page['pageurl'].(isset($page['redirect']) ? $and.'redirect=no' : ''); ?>" tabindex="14">Annuler</a>
 					</p>
 				</div>
 				
@@ -126,7 +138,7 @@
 			</form>
 		<?php elseif ($mode == 'historique') : ?>
 			<?php if (isset($see_content)) : ?>
-				<h1>Version de &laquo; <?php echo $page['title']; ?> &raquo; du <?php echo $versions[(int)$_GET['s']]; ?></h1>
+				<h1>Version de « <?php echo $page['title']; ?> » du <?php echo $versions[(int)$_GET['s']]; ?></h1>
 				<p>
 					<a href="<?php echo $page['pageurl']; ?>">Retour à l'article</a> - 
 					<a href="<?php echo $page['pageurl'].$and.'a=historique'; ?>">Retour à l'historique</a>
@@ -136,7 +148,7 @@
 				</p>
 				<?php echo $see_content; ?>
 			<?php elseif (isset($diff)) : ?>
-				<h1>Différences entre les versions de &laquo; <?php echo $page['title']; ?> &raquo;</h1>
+				<h1>Différences entre les versions de « <?php echo $page['title']; ?> »</h1>
 				<p>
 					<a href="<?php echo $page['pageurl']; ?>">Retour à l'article</a> - 
 					<a href="<?php echo $page['pageurl'].$and.'a=historique'; ?>">Retour à l'historique</a>
@@ -166,7 +178,7 @@
 					</tbody>
 				</table>
 			<?php else : $nbr = count($versions); ?>
-				<h1>Historique des versions de &laquo; <?php echo $page['title']; ?> &raquo;</h1>
+				<h1>Historique des versions de « <?php echo $page['title']; ?> »</h1>
 				
 				<p>
 					<a href="<?php echo $page['pageurl']; ?>">Retour à l'article</a>

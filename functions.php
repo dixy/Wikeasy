@@ -10,6 +10,8 @@ define('RETURN_VAL', TRUE); //Permet de retourner une valeur au lieu de l'affich
 define('DT_HOUR', TRUE); //Permet d'afficher l'heure avec une date
 define('DT_INTERVAL', TRUE); //Permet d'afficher un intervalle de temps plutôt qu'une date
 
+define('CREATE_CACHE', TRUE); //Indique qu'on veut créer le fichier de cache plutôt que le récupérer (utilisé avec cache_categories())
+
 /**
  *	Retourne le titre de l'article à mettre dans une URL, à partir d'un
  *	titre étant déjà passé à la fonction `clean_url`.
@@ -197,7 +199,7 @@ function generate_cache_list($namespace)
 			
 			$pos_title = strpos($contenu_page, '<title>');
 			$pos_title_end = strpos($contenu_page, '</title>', $pos_title);
-			$titre_page = substr($contenu_page, $pos_title+7, $pos_title_end-($pos_title+7));
+			$titre_page = substr($contenu_page, $pos_title + 7, $pos_title_end - ($pos_title + 7));
 			
 			if (strpos($contenu_page, '<redirectto>') === FALSE)
 				$list_articles[] = $titre_page;
@@ -207,7 +209,7 @@ function generate_cache_list($namespace)
 	
 	natcasesort($list_articles);
 		
-	write_file(PATH_CNT.$namespace.'_articles.php', '<?php $list_articles = '.var_export($list_articles, true).';');
+	write_file(PATH_CNT.$namespace.'_articles.php', '<?php $list_articles = '.var_export($list_articles, TRUE).';');
 }
 
 /**
@@ -244,7 +246,7 @@ function install()
 			'motdepasse' => '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'pageurl_type' => 'normal', 
 			'salt' => uniqid(mt_rand(), true), 'version' => VERSION, 'nombre_modifs_recentes' => 50, 'proteger_pages' => 0,
 			'namespace_defaut' => 'Principal');
-		write_file($dossier.'/config.php', '<?php $config = '.var_export($config, true).';');
+		write_file($dossier.'/config.php', '<?php $config = '.var_export($config, TRUE).';');
 		create_file(array(
 			'name' => 'Accueil', 'title' => 'Accueil', 'content' => "L'installation s'est bien déroulée.\n\nVos ".
 			"identifiants de connexion sont __admin__ et __123456__.%%%\nVous pouvez modifier ces informations en ".
@@ -312,8 +314,8 @@ function parsewiki($text)
 			   htmlspecialchars($r[1]).'</a></p></div>';
 	}
 	
-	if (preg_match('`//Cat[eé]gorie:([^/]+)//`iu', $text))
-		$text = trim(preg_replace('`//Cat[eé]gorie:([^/]+)//`iu', '', $text));
+	//if (preg_match('`//Cat[eé]gorie:([^/]+)//`iu', $text))
+	//	$text = trim(preg_replace('`//Cat[eé]gorie:([^/]+)//`iu', '', $text));
 	
 	$wiki = new WikiRenderer();
 	return $wiki->render($text);
@@ -351,8 +353,8 @@ function save_last_change($pagetitle, $version = 0, $special = array())
 	
 	if ($version > 0) $new['version'] = $version;
 	if (isset($special['oldname'])) $new['oldname'] = $special['oldname'];
-	elseif (isset($special['delete'])) $new['delete'] = true;
-	elseif (isset($special['undelete'])) $new['undelete'] = true;
+	elseif (isset($special['delete'])) $new['delete'] = TRUE;
+	elseif (isset($special['undelete'])) $new['undelete'] = TRUE;
 	
 	$recentchanges[] = $new;
 	
@@ -360,7 +362,7 @@ function save_last_change($pagetitle, $version = 0, $special = array())
 		array_shift($recentchanges);
 	
 	write_file(PATH_CNT.'modifications_recentes.php', 
-		'<?php $recentchanges = '.var_export($recentchanges, true).';');
+		'<?php $recentchanges = '.var_export($recentchanges, TRUE).';');
 }
 
 /**
@@ -377,12 +379,12 @@ function format_date($date, $hour = FALSE, $interval = FALSE)
 	
 	if ($interval)
 	{
-		$diff = time()-$date;
+		$diff = time() - $date;
 		if ($diff < 60)
 			return 'il y a '.$diff.'s';
 		elseif ($diff < 3600)
 			return 'il y a '.(int)date('i', $diff).' min';
-		elseif ($diff < 3600*2)
+		elseif ($diff < 3600 * 2)
 			return 'il y a '.(int)date('h', $diff-3600).'h'.date('i', $diff);
 	}
 	
@@ -491,13 +493,55 @@ function config_item($item = '', $newval = '')
 }
 
 /**
- *   Affiche une page avec un message.
+ *  Affiche une page avec un message.
  */
 function show_error($message, $heading = 'Erreur', $back_index = TRUE)
 {
 	set_title($heading);
 	require PATH.theme_url(RETURN_VAL).'message.php';
 	exit;
+}
+
+/**
+ *  Création d'une nouvelle catégorie.
+ *  
+ *  @param string $name
+ */
+function create_category($name)
+{
+    if (is_dir(PATH_PG.$name))
+        return FALSE;
+    
+    mkdir(PATH_PG.$name, 0777);
+    mkdir(PATH_CNT.'historique/'.$name, 0777);
+    
+    cache_categories(CREATE_CACHE);
+}
+
+/**
+ *  Création du fichier de cache de la liste des catégories.
+ */
+function cache_categories($create = FALSE)
+{
+    $file = PATH_CNT.'categories';
+    
+    if ($create == CREATE_CACHE)
+    {
+        $cats = array();
+        $dir = dir(PATH_PG);
+        while (($cat = $dir->read()) !== FALSE)
+            if ($cat[0] != '.' && is_dir(PATH_PG.$cat))
+                $cats[] = $cat;
+        $dir->close();
+        write_file($file, serialize($cats));
+    }
+    else
+    {
+        if (!is_file($file))
+            cache_categories(CREATE_CACHE);
+        
+        return unserialize(file_get_contents($file));
+    }
 }
 
 /* End of file functions.php */

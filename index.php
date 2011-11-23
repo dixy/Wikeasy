@@ -53,7 +53,7 @@ if (get_magic_quotes_gpc())
 	$_POST 	= stripslashes_array($_POST);
 }
 
-if (!isset($_SESSION['wik_connect'])) $_SESSION['wik_connect'] = false;
+if (!isset($_SESSION['wik_connect'])) $_SESSION['wik_connect'] = FALSE;
 
 if (!ini_get('date.timezone'))
 	date_default_timezone_set('Europe/Paris');
@@ -92,7 +92,7 @@ if (in_array($mode, array('lire', 'modifier', 'supprimer', 'historique', 'renomm
 		if (preg_match('`^[[:alpha:]]{2,}$`u', mb_substr($cleaned_title, 0, mb_strpos($cleaned_title, ':')), $ns))
 		{
 			if (!is_dir(PATH_PG.$ns[0]))
-				show_error('wrong namespace');
+				show_error('Cette catégorie n\'existe pas.');
 			else
 			{
 				$namespace = $ns[0];
@@ -129,6 +129,7 @@ if ($mode == 'modifier')
 	if (check_access($page))
 	{
 		set_title((isset($page['page_exists']) ? 'Modification' : 'Création').' de "'.$page['title'].'"');
+		$categories = cache_categories();
 		
 		if (!empty($_GET['r']))
 		{
@@ -205,12 +206,12 @@ elseif ($mode == 'parametres')
 			$liste_themes[] = $theme;
 	closedir($dir);
 	
-	$rewrite_status = false;
-	if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) $rewrite_status = true;
+	$rewrite_status = FALSE;
+	if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) $rewrite_status = TRUE;
 	if (!$rewrite_status)
 	{
 		ob_start(); phpinfo(); $r = ob_get_clean();
-		if (strpos($r, 'mod_rewrite') !== false) $rewrite_status = true;
+		if (strpos($r, 'mod_rewrite') !== FALSE) $rewrite_status = TRUE;
 	}
 	
 	if (!empty($_POST['config']) && !empty($_POST['_cfgnonce']))
@@ -235,8 +236,8 @@ elseif ($mode == 'parametres')
 			elseif (config_item('pageurl_type') == 'normal' && is_file(PATH.'.htaccess'))
 				rename(PATH.'.htaccess', PATH.'htaccess.txt');
 			
-			config_item('salt', uniqid(mt_rand(), true));
-			$contenu_config = '<?php $config = '.var_export(config_item(), true).'; ?>';
+			config_item('salt', uniqid(mt_rand(), TRUE));
+			$contenu_config = '<?php $config = '.var_export(config_item(), TRUE).'; ?>';
 			
 			if (write_file(PATH_CNT.'config.php', $contenu_config))
 				$erreur = 'Configuration modifiée';
@@ -294,7 +295,7 @@ elseif ($mode == 'historique')
 	if (!isset($page['page_exists']))
 		redirect($page['pageurl']);
 	
-	set_title('Historique des versions de &laquo; '.$page['title'].' &raquo');
+	set_title('Historique des versions de « '.$page['title'].' »');
 	
 	$versions = array();
 	$path = PATH_CNT.'historique/'.$namespace.'/'.$page['name'];
@@ -368,11 +369,11 @@ elseif ($mode == 'renommer')
 					{
 						$page['name'] = $new_name;
 						$page['title'] = art_title($new_name);
-						create_file($page, true, false);
+						create_file($page, TRUE, FALSE);
 						
 						$oldpage['lastversion'] = 0;
 						$oldpage['content'] = '#REDIRECT [['.$page['title'].']]';
-						create_file($oldpage, false, true, false);
+						create_file($oldpage, FALSE, TRUE, FALSE);
 						
 						save_last_change($page['title'], 0, array('oldname' => $oldpage['title']));
 						
