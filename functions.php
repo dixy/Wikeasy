@@ -80,12 +80,12 @@ function get_page($nom, $namespace = '')
 		xml_parser_free($parser);
 		
 		$return['name'] = $nom;
-		$return['title'] = ($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$valeurs[$index_tags['title'][0]]['value'];
+		$return['title'] = $valeurs[$index_tags['title'][0]]['value'];
 		$return['content'] = trim($valeurs[$index_tags['content'][0]]['value']);
 		$return['lastmodif'] = $valeurs[$index_tags['lastmodif'][0]]['value'];
 		$return['status'] = $valeurs[$index_tags['status'][0]]['value'];
 		$return['lastversion'] = (int)$valeurs[$index_tags['lastversion'][0]]['value'];
-		$return['pageurl'] = base_path().pageurl(art_title2url($return['title']));
+		$return['pageurl'] = base_path().pageurl(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').art_title2url($return['title']));
 		$return['page_exists'] = TRUE;
 		
 		if (isset($index_tags['categories']))
@@ -518,7 +518,7 @@ function cache_categories($create = FALSE)
     if ($create == CREATE_CACHE)
     {
         $cats = array();
-        $dir = dir(PATH_CACHE.'Catégorie');
+        $dir = dir(PATH_PG.'Catégorie');
         while (($cat = $dir->read()) !== FALSE)
         {
             if ($cat[0] != '.')

@@ -479,7 +479,7 @@ elseif ($mode == 'lire')
 		$was_deleted = array_key_exists($page['name'], deleted_articles());
 	}
 	
-	set_title($page['title']);
+	set_title(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$page['title']);
 }
 
 

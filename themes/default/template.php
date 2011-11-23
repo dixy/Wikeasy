@@ -27,7 +27,7 @@
 		
 		<div id="content">
 		<?php if ($mode == 'lire') : ?>
-			<h1><?php echo $page['title']; ?></h1>
+			<h1><?php echo ($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$page['title']; ?></h1>
 			<?php if (isset($page['page_exists'])) : ?>
 				<?php echo $page['content']; ?>
 				
