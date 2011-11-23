@@ -279,7 +279,7 @@ elseif ($mode == 'supprimer')
 				delete_history($page['name'], $namespace);
 				unlink(PATH_PG.$namespace.'/'.$page['name'].'.xml');
 				
-				save_last_change($page['title'], 0, array('delete' => 1));
+				save_last_change($page['title'], $namespace, 0, array('delete' => 1));
 				generate_cache_list($namespace);
 				generate_deleted_articles_cache();
 				redirect();
@@ -385,7 +385,7 @@ elseif ($mode == 'renommer')
 						$oldpage['content'] = '#REDIRECT [['.$page['title'].']]';
 						create_file($oldpage, FALSE, TRUE, FALSE);
 						
-						save_last_change($page['title'], 0, array('oldname' => $oldpage['title']));
+						save_last_change($page['title'], $namespace, 0, array('oldname' => $oldpage['title']));
 						
 						generate_cache_list($namespace);
 						redirect(base_path().pageurl(art_title2url($page['title'])));
@@ -445,7 +445,7 @@ elseif ($mode == 'suppressions')
 							'lastversion' => 0);
 						
 						create_file($page, FALSE, TRUE, FALSE);
-						save_last_change($page['title'], 0, array('undelete' => 1));
+						save_last_change($page['title'], $namespace, 0, array('undelete' => 1));
 						
 						unlink(PATH_CNT.'suppressions/'.$_GET['r']);
 						
