@@ -210,9 +210,9 @@ function install()
 		mkdir($dossier.'/historique/Catégorie', 0777);
 		$config = array(
 			'page_defaut' => 'Accueil', 'utilisateur' => 'admin', 'nom_wiki' => 'Wikeasy', 'theme' => 'default',
-			'motdepasse' => '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'pageurl_type' => 'normal', 
-			'salt' => uniqid(mt_rand(), TRUE), 'version' => VERSION, 'nombre_modifs_recentes' => 50, 'proteger_pages' => 0,
-			'namespace_defaut' => 'Principal');
+			'pageurl_type' => 'normal', 'salt' => uniqid(mt_rand(), TRUE), 'version' => VERSION, 
+			'nombre_modifs_recentes' => 50, 'proteger_pages' => 0, 'namespace_defaut' => 'Principal');
+		$config['motdepasse'] = hash('sha256', $config['salt'].'123456');
 		write_file($dossier.'/config.php', '<?php $config = '.var_export($config, TRUE).';');
 		create_file(array(
 			'name' => 'Accueil', 'title' => 'Accueil', 'content' => "L'installation s'est bien déroulée.\n\nVos ".

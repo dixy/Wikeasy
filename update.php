@@ -118,6 +118,9 @@ function up_031_to_04() { mkdir(PATH_CNT.'suppressions', 0777); }
 
 function up_04_to05()
 {
+	global $config;
+	$config['motdepasse'] = hash('sha256', $config['salt'].'123456');
+	
     mkdir(PATH_CNT.'cache', 0777);
 	mkdir(PATH_PG.'Principal', 0777);
 	mkdir(PATH_PG.'Catégorie', 0777);
@@ -132,6 +135,9 @@ function up_04_to05()
 		if (!isset($c['namespace']))
 			$c['namespace'] = 'Principal';
 	write_file(PATH_CNT.'modifications_recentes', serialize($recentchanges));
+	
+	return '<strong>Attention</strong> Le mot de passe administrateur a été changé. Le nouveau mot de passe est <strong>123456</strong>.'.
+			'Il est conseillé de le changer dès maintenant.';
 }
 
 /*

@@ -204,7 +204,7 @@ elseif ($mode == 'connexion')
 	
 	if (!empty($_POST['util']) && !empty($_POST['mdp']))
 	{
-		if ($_POST['util'] == config_item('utilisateur') && hash('sha256', $_POST['mdp']) == config_item('motdepasse'))
+		if ($_POST['util'] == config_item('utilisateur') && hash('sha256', config_item('salt').$_POST['mdp']) == config_item('motdepasse'))
 		{
 			$_SESSION['wik_connect'] = TRUE;
 			redirect();
