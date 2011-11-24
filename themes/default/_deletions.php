@@ -1,15 +1,15 @@
-	<?php if (isset($undelete)) : ?><h1>Restaurer une page supprimée</h1>
-			<?php if (isset($erreur)) : ?><div class="bloc-erreur"><?php echo $erreur; ?></div><?php endif; ?>
+	<?php if (isset($undelete)) : $title = ($undelete['namespace'] != config_item('namespace_defaut') ? $undelete['namespace'].':' : '').$undelete['title']; ?><h1>Restaurer une page supprimée</h1>
+			<?php if (isset($erreur)) : ?><p class="erreur"><?php echo $erreur; ?></p><?php endif; ?>
 
 			
-			<p>Vous êtes entrain de restaurer la page &laquo; <?php echo $undelete['title']; ?> &raquo;</p>
-			<?php if ($check_exists) : ?><p class="erreur">
+			<p>Vous êtes entrain de restaurer la page « <?php echo $title; ?> »</p>
+			<?php if ($check_exists) : ?><p class="avertissement">
 				Attention ! Un article du même nom a été créé après la suppression de celui-ci.
 			</p><?php endif; ?>
 
 			
 			<fieldset id="undelete-text">
-				<legend>Version de <?php echo $undelete['title']; ?> du <?php echo format_date($undelete['deletetime'], DT_HOUR); ?></legend>
+				<legend>Version de <?php echo $title; ?> du <?php echo format_date($undelete['deletetime'], DT_HOUR); ?></legend>
 				<?php echo parsewiki($undelete['content']); ?>
 
 			</fieldset>
@@ -29,7 +29,7 @@
 				<a href="<?php echo base_path(); ?>index.php?a=suppressions">Annuler</a>
 			</form>
 		<?php else : ?><h1>Liste des pages supprimées</h1><?php
-			 if (isset($erreur)) echo '<div class="bloc-erreur">'.$erreur.'</div>'; ?>
+			 if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
 
 			<?php if (empty($pages_deleted)) : ?><p>Aucune page supprimée trouvée.</p><?php else : ?>
 	
@@ -38,7 +38,8 @@
 			<ul>
 				<?php foreach ($pages_deleted as $name => $article) : ?>
 
-				<li><a href="<?php echo base_path().'index.php?a=suppressions&amp;r='.$name; ?>"><?php echo $article['title']; 
+				<li><a href="<?php echo base_path().'index.php?a=suppressions&amp;r='.$name; ?>"><?php 
+				echo ($article['namespace'] != config_item('namespace_defaut') ? $article['namespace'].':' : '').$article['title']; 
 				?></a> supprimée le <?php echo format_date($article['deletetime'], DT_HOUR); 
 				if ($article['isredirect']) : ?> <em>(redirection)</em><?php endif; ?></li><?php endforeach; ?>
 

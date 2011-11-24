@@ -400,15 +400,22 @@ function generate_deleted_articles_cache()
 {
 	$deleted = array();
 	
-	if ($dir = opendir(PATH_CNT.'suppressions'))
+	if ($dir = dir(PATH_CNT.'suppressions'))
 	{
-		while (($art = readdir($dir)) !== FALSE)
-			if ($art[0] != '.')
-				$deleted[] = $art;
-		closedir($dir);
+		while (($ns = $dir->read()) !== FALSE)
+		{
+			if ($ns[0] != '.' && is_dir($dir->path.'/'.$ns) && $nsdir = dir($dir->path.'/'.$ns))
+			{
+				while (($art = $nsdir->read()) !== FALSE)
+					if ($art[0] != '.')
+						$deleted[($ns != config_item('namespace_defaut') ? $ns.':' : '').$art] = $ns.'/'.$art;
+				$nsdir->close();
+			}
+		}
+		$dir->close();
 	}
 	
-	write_file(PATH_CACHE.'liste_supprimes', serialize(array_flip($deleted)));
+	write_file(PATH_CACHE.'liste_supprimes', serialize($deleted));
 }
 
 /**

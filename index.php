@@ -181,7 +181,7 @@ if ($mode == 'modifier')
 					
 					if (create_file($page, $namespace))
 					{
-						if ($namespace == 'Catégorie' || $namespace == 'Categorie')
+						if ($namespace == 'Catégorie')
 							cache_categories(CREATE_CACHE);
 						generate_cache_list($namespace);
 						redirect($page['pageurl'].(isset($page['redirect']) ? pageurl('&', '?').'redirect=no' : ''));
@@ -266,40 +266,8 @@ elseif ($mode == 'parametres')
 			else
 				$erreur = 'Erreur lors de la modification du fichier de configuration';
 		}
-		else $erreur = 'Opération incorrecte.';
+		else $erreur = 'L\'opération n\'a pas pu être validée.';
 	}
-}
-elseif ($mode == 'supprimer')
-{
-	if (!$page['page_exists']) redirect($page['pageurl']);
-	
-	if (!empty($_POST['suppr_ok']) && !empty($_POST['_delnonce']))
-	{
-		if (verify_nonce('delete-page', $_POST['_delnonce']))
-		{
-			$pagedeleted = array(
-				'title' => $page['title'],
-				'content' => file_get_contents(PATH_CNT.'historique/'.$namespace.'/'.$page['name'].'/'.$page['lastversion'].'.txt'),
-				'deletetime' => time(),
-				'isredirect' => isset($page['redirect']),
-				'namespace' => $namespace);
-			
-			if (write_file(PATH_CNT.'suppressions/'.$page['name'], serialize($pagedeleted)))
-			{
-				delete_history($page['name'], $namespace);
-				unlink(PATH_PG.$namespace.'/'.$page['name'].'.txt');
-				
-				save_last_change($page['title'], $namespace, 0, array('delete' => 1));
-				generate_cache_list($namespace);
-				generate_deleted_articles_cache();
-				redirect();
-			}
-			else $erreur = 'Erreur lors de la création du fichier de restauration.';
-		}
-		else $erreur = 'Opération incorrecte.';
-	}
-	
-	set_title('Supprimer '.$page['title']);
 }
 elseif ($mode == 'liste')
 {
@@ -416,6 +384,45 @@ elseif ($mode == 'redirections')
 	
 	require PATH_CACHE.'liste_redirections.php';
 }
+elseif ($mode == 'supprimer')
+{
+	if (!$page['page_exists']) redirect($page['pageurl']);
+	
+	if (!empty($_POST['suppr_ok']) && !empty($_POST['_delnonce']))
+	{
+		if (verify_nonce('delete-page', $_POST['_delnonce']))
+		{
+			if (!is_dir(PATH_CNT.'suppressions/'.$namespace))
+				mkdir(PATH_CNT.'suppressions/'.$namespace, 0777);
+			
+			$pagedeleted = array(
+				'title' => $page['title'],
+				'content' => file_get_contents(PATH_CNT.'historique/'.$namespace.'/'.$page['name'].'/'.$page['lastversion'].'.txt'),
+				'deletetime' => time(),
+				'isredirect' => isset($page['redirect']),
+				'namespace' => $namespace,
+				'categories' => $page['categories']);
+			
+			if (write_file(PATH_CNT.'suppressions/'.$namespace.'/'.$page['name'], serialize($pagedeleted)))
+			{
+				delete_history($page['name'], $namespace);
+				unlink(PATH_PG.$namespace.'/'.$page['name'].'.txt');
+				
+				if ($namespace == 'Catégorie')
+					cache_categories(CREATE_CACHE);
+				
+				save_last_change($page['title'], $namespace, 0, array('delete' => 1));
+				generate_cache_list($namespace);
+				generate_deleted_articles_cache();
+				redirect();
+			}
+			else $erreur = 'Erreur lors de la création du fichier de restauration.';
+		}
+		else $erreur = 'L\'opération n\'a pas pu être validée.';
+	}
+	
+	set_title('Supprimer '.$page['title']);
+}
 elseif ($mode == 'suppressions')
 {
 	set_title('Liste des pages supprimées');
@@ -423,8 +430,8 @@ elseif ($mode == 'suppressions')
 	$pages_deleted = deleted_articles();
 	
 	foreach ($pages_deleted as $name => &$infos)
-		if (is_file(PATH_CNT.'suppressions/'.$name))
-			$infos = unserialize(file_get_contents(PATH_CNT.'suppressions/'.$name));
+		if (is_file(PATH_CNT.'suppressions/'.$infos))
+			$infos = unserialize(file_get_contents(PATH_CNT.'suppressions/'.$infos));
 	
 	if (!empty($_GET['r']))
 	{
@@ -433,37 +440,42 @@ elseif ($mode == 'suppressions')
 			set_title('Restaurer une page supprimée');
 			
 			$undelete = $pages_deleted[$_GET['r']];
-			$check_exists = is_file(PATH_PG.$_GET['r'].'.txt');
+			$check_exists = is_file(PATH_PG.$undelete['namespace'].'/'.$_GET['r'].'.txt');
 			
-			if (!empty($_POST['_undelnonce']) && !empty($_POST['undelete_ok']) && !empty($_POST['undel_act']))
+			if (!empty($_POST['_undelnonce']) && !empty($_POST['undelete_ok']) && (!$check_exists || !empty($_POST['undel_act'])))
 			{
 				if (verify_nonce('undelete-page', $_POST['_undelnonce']))
 				{
 					$new_title = !empty($_POST['new_title']) ? clean_title($_POST['new_title']) : '';
-					$act = $_POST['undel_act'] == 'delete' ? 'delete' : 'new';
+					if ($check_exists)
+						$act = $_POST['undel_act'] == 'delete' ? 'delete' : 'new';
 					
-					if ($check_exists || (($act == 'new' && !empty($new_title) && !is_file(PATH_PG.$new_title.'.txt')) || $act == 'delete'))
+					if (!$check_exists || (($act == 'new' && !empty($new_title) && !is_file(PATH_PG.$undelete['namespace'].'/'.$new_title.'.txt')) || $act == 'delete'))
 					{
 						if ($check_exists && $act == 'delete')
-							delete_history($_GET['r'], $namespace, FALSE);
+							delete_history(art_title2url($undelete['title']), $namespace, FALSE);
 					
 						$page = array(
-							'name' => ($check_exists && $act == 'new') ? $new_title : $_GET['r'],
+							'name' => ($check_exists && $act == 'new') ? $new_title : art_title2url($undelete['title']),
 							'title' => ($check_exists && $act == 'new') ? art_title($new_title) : $undelete['title'],
 							'content' => $undelete['content'],
 							'status' => 'public',
-							'lastversion' => 0);
+							'lastversion' => 0,
+							'categories' => $undelete['categories']);
 						
-						create_file($page, FALSE, TRUE, FALSE);
-						save_last_change($page['title'], $namespace, 0, array('undelete' => 1));
+						create_file($page, $undelete['namespace'], FALSE, TRUE, FALSE);
+						save_last_change($page['title'], $undelete['namespace'], 0, array('undelete' => 1));
 						
-						unlink(PATH_CNT.'suppressions/'.$_GET['r']);
+						unlink(PATH_CNT.'suppressions/'.$undelete['namespace'].'/'.art_title2url($undelete['title']));
 						
-						generate_cache_list($namespace);
+						generate_cache_list($undelete['namespace']);
 						generate_deleted_articles_cache();
 						
+						if ($namespace == 'Catégorie')
+							cache_categories(CREATE_CACHE);
+						
 						redirect(base_path().
-								pageurl(art_title2url($page['name'])).
+								pageurl(($undelete['namespace'] != config_item('namespace_defaut') ? $undelete['namespace'].':' : '').art_title2url($page['name'])).
 								($undelete['isredirect'] ? pageurl('&', '?').'redirect=no' : ''));
 					}
 					else $erreur = 'Le nom de l\'article n\'a pas été renseigné, ou un article du même nom existe déjà.';
