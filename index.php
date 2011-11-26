@@ -471,7 +471,7 @@ elseif ($mode == 'suppressions')
 						generate_cache_list($undelete['namespace']);
 						generate_deleted_articles_cache();
 						
-						if ($namespace == 'Catégorie')
+						if ($undelete['namespace'] == 'Catégorie')
 							cache_categories(CREATE_CACHE);
 						
 						redirect(base_path().
