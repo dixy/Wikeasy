@@ -68,13 +68,15 @@
 							echo implode(', ', array_map(function ($c) { return '<input type="hidden" name="categories_page[]" value="'.$c.'" />'.$c; }, $page['categories']));
 						endif;
 						?></span> 
+						<?php if ($categories = array_diff_key($categories, array_flip($page['categories']))) : ?>
 						<select name="ajout_cat_nom" id="ajout_cat_nom" tabindex="3">
 							<option value="0"></option>
 							<?php foreach ($categories as $c_nom => $c_titre) : ?><option value="<?php echo $c_nom; ?>"><?php echo $c_titre; ?></option>
 							<?php endforeach; ?>
 
 						</select>
-						<input type="submit" value="Ajouter" name="ajout_categorie" class="submit" accesskey="c" />
+						<input type="submit" value="Ajouter" name="ajout_categorie" class="submit" accesskey="c" /><?php endif; ?>
+
 					</div>
 					
 					<?php if ($_SESSION['wik_connect']) : ?>

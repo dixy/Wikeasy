@@ -132,6 +132,9 @@ if ($mode == 'modifier')
 		set_title(($page['page_exists'] ? 'Modification' : 'Création').' de "'.$page['title'].'"');
 		$categories = cache_categories();
 		
+		if ($namespace == 'Catégorie')
+			unset($categories[$page['name']]);
+		
 		if (!empty($_GET['r']))
 		{
 			$pathfile = PATH_CNT.'historique/'.$namespace.'/'.$page['name'].'/'.(int)$_GET['r'].'.txt';
@@ -163,10 +166,11 @@ if ($mode == 'modifier')
 						if (isset($categories[$_POST['ajout_cat_nom']]))
 						{
 							if (!in_array($_POST['ajout_cat_nom'], $page['categories']))
+							{
 								$page['categories'][] = $_POST['ajout_cat_nom'];
+							}
 						}
-						else
-							$erreur = 'La catégorie choisie n\'existe pas.';
+						else $erreur = 'La catégorie choisie n\'existe pas.';
 					}
 					else $erreur = 'Vous devez choisir une catégorie.';
 				}
