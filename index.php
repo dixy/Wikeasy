@@ -513,4 +513,5 @@ elseif ($mode == 'lire')
 */
 
 require PATH.theme_url(RETURN_VAL).'template.php';
-?>
+
+/* End of file index.php */

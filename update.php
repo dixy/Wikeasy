@@ -146,4 +146,5 @@ function up_04_to05()
 
 up_template('Information', 'Votre wiki a été mis à jour avec succès.<br /><br />'.
 	(empty($messages) ? '' : implode('<br /><br />', $messages).'<br /><br />').'<a href="'.base_path().'">Index</a>');
-?>
+
+/* End of file update.php */

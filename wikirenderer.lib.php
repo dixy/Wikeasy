@@ -1078,4 +1078,5 @@ class wr3xhtml_definition extends WikiRendererBloc {
 		return "<dt>$dt</dt>\n<dd>$dd</dd>\n";
 	}
 }
-?>
+
+/* End of file wikirenderer.lib.php */

@@ -671,3 +671,5 @@ class WikeasyDiffFormatter extends DiffFormatter {
 		foreach ($add as $line) { $this->rows[] = array_merge($this->emptyLine(), $this->addedLine($line)); }
 	}
 }
+
+/* End of file diffengine.php */
