@@ -91,7 +91,6 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if (!is_dir(PATH_CNT.'historique/'.$ns.'/'.$page['name']))
 		mkdir(PATH_CNT.'historique/'.$ns.'/'.$page['name'], 0777);
 	
-	$redirect = '';
 	if (substr($page['content'], 0, 9) == '#REDIRECT')
 		if (preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $page['content'], $r))
 			$page['redirect'] = art_title2url(clean_title($r[1]));
