@@ -9,11 +9,12 @@
 *	Constantes utiles et chargement des fonctions.
 */
 
-define('VERSION', '0.5-dev');
+define('VERSION', '0.5');
 
-define('PATH', 		dirname(__FILE__).'/');
-define('PATH_CNT',	PATH.'content/');
-define('PATH_PG',	PATH_CNT.'pages/');
+define('PATH',	  dirname(__FILE__).'/');
+define('PATH_CNT',  PATH.'content/');
+define('PATH_PG',   PATH_CNT.'pages/');
+define('PATH_CACHE',PATH_CNT.'cache/');
 
 require PATH.'functions.php';
 
@@ -48,11 +49,11 @@ function up_template($titre, $contenu)
 
 function write_config($config)
 {
-	$config['salt'] = uniqid(mt_rand(), true); //On change le grain de sel.
-	$contenu_config = '<?php $config = '.var_export($config, true).'; ?>';
+	$contenu_config = '<?php $config = '.var_export($config, true).';';
 	
 	if (!write_file(PATH_CNT.'config.php', $contenu_config))
-		up_template('Erreur', 'Erreur lors de la modification du fichier de configuration. Vérifiez que le chmod du dossier content est à 777.');
+		up_template('Erreur', 'Erreur lors de la modification du fichier de configuration. '.
+				'Vérifiez que le chmod du dossier content est à 777.');
 }
 
 /*
@@ -69,6 +70,9 @@ if (!isset($config['version'])) $config['version'] = '0.2';
 /*
 *	Mise à jour.
 */
+
+if ($config['version'] == VERSION)
+	up_template('Information', 'Votre wiki est à jour.<br /><br /><a href="'.base_path().'">Index</a>');
 
 $messages = array();
 $possible_update = array('0.2', '0.3', '0.3.1', '0.4');
@@ -104,7 +108,7 @@ function up_02_to_03()
 			$nom = substr($p, 0, -4);
 			$page = get_page($nom);
 			$page['content'] = file_get_contents(PATH_CNT.'historique/'.$nom.'/'.$page['lastversion'].'.txt');
-			create_file($page, FALSE, FALSE);
+			create_file($page, '', FALSE, FALSE);
 		}
 	}
 	closedir($dir);
@@ -116,27 +120,78 @@ function up_02_to_03()
 function up_03_to_031() { }
 function up_031_to_04() { mkdir(PATH_CNT.'suppressions', 0777); }
 
-function up_04_to05()
+function up_04_to_05()
 {
 	global $config;
 	$config['motdepasse'] = hash('sha256', $config['salt'].'123456');
+	$config['namespace_defaut'] = 'Principal';
+	$ns = 'Principal';
 	
-    mkdir(PATH_CNT.'cache', 0777);
+	mkdir(PATH_CNT.'cache', 0777);
 	mkdir(PATH_PG.'Principal', 0777);
 	mkdir(PATH_PG.'Catégorie', 0777);
-	mkdir(PATH_CNT.'historique/Principal', 0777);
+	rename(PATH_CNT.'historique', PATH_CNT.'Principal');
+	mkdir(PATH_CNT.'historique', 0777);
+	rename(PATH_CNT.'Principal', PATH_CNT.'historique/Principal');
 	mkdir(PATH_CNT.'historique/Catégorie', 0777);
 	
 	$recentchanges = array();
 	if (is_file(PATH_CNT.'modifications_recentes.php'))
+	{
 		require PATH_CNT.'modifications_recentes.php';
+		unlink(PATH_CNT.'modifications_recentes.php');
+	}
 	$recentchanges = array_reverse($recentchanges);
 	foreach ($recentchanges as &$c)
 		if (!isset($c['namespace']))
 			$c['namespace'] = 'Principal';
-	write_file(PATH_CNT.'modifications_recentes', serialize($recentchanges));
+	write_file(PATH_CACHE.'modifications_recentes', serialize($recentchanges));
 	
-	return '<strong>Attention</strong> Le mot de passe administrateur a été changé. Le nouveau mot de passe est <strong>123456</strong>.'.
+	if (is_file(PATH_CNT.'liste_pages.php')) unlink(PATH_CNT.'liste_pages.php');
+	if (is_file(PATH_CNT.'liste_redirections.php')) unlink(PATH_CNT.'liste_redirections.php');
+	
+	$dir = dir(PATH_PG);
+	while (($p = $dir->read()) !== FALSE)
+	{
+		if ($p[0] != '.' && !is_dir($dir->path.'/'.$p))
+		{
+			$contenu_fichier = file_get_contents($dir->path.'/'.$p);
+			
+			$parser = xml_parser_create('UTF-8');
+			xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+			xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 0);
+			xml_parse_into_struct($parser, $contenu_fichier, $valeurs, $index_tags);
+			xml_parser_free($parser);
+			
+			$page = array(
+				'name' => clean_title($valeurs[$index_tags['title'][0]]['value']),
+				'title' => $valeurs[$index_tags['title'][0]]['value'],
+				'content' => trim($valeurs[$index_tags['content'][0]]['value']),
+				'lastmodif' => $valeurs[$index_tags['lastmodif'][0]]['value'],
+				'status' => $valeurs[$index_tags['status'][0]]['value'],
+				'lastversion' => (int)$valeurs[$index_tags['lastversion'][0]]['value'],
+				'categories' => array()
+			);
+			
+			if (isset($index_tags['redirectto']))
+				$page['redirect'] = $valeurs[$index_tags['redirectto'][0]]['value'];
+			
+			if (!is_dir(PATH_CNT.'historique/'.$ns.'/'.$page['name']))
+				mkdir(PATH_CNT.'historique/'.$ns.'/'.$page['name'], 0777);
+			
+			if (substr($page['content'], 0, 9) == '#REDIRECT')
+				if (preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $page['content'], $r))
+					$page['redirect'] = art_title2url(clean_title($r[1]));
+			
+			write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
+			unlink($dir->path.'/'.$p);
+			
+			if (is_dir(PATH_CNT.'historique/'.$ns.'/'.substr($p, 0, -4)))
+				rename(PATH_CNT.'historique/'.$ns.'/'.substr($p, 0, -4), PATH_CNT.'historique/'.$ns.'/'.$page['name']);
+	   }
+	}
+	
+	return '<strong>Attention</strong> Le mot de passe administrateur a été changé. Le nouveau mot de passe est <strong>123456</strong>. '.
 			'Il est conseillé de le changer dès maintenant.';
 }
 
