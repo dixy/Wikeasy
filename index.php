@@ -226,11 +226,11 @@ elseif ($mode == 'parametres')
 	set_title('Paramètres du wiki');
 	
 	$liste_themes = array();
-	$dir = opendir(PATH.'themes');
-	while ($theme = readdir($dir))
+	$dir = dir(PATH.'themes');
+	while (($theme = $dir->read()) !== FALSE)
 		if ($theme[0] != '.' && is_file(PATH.'themes/'.$theme.'/template.php'))
 			$liste_themes[] = $theme;
-	closedir($dir);
+	$dir->close();
 	
 	$rewrite_status = FALSE;
 	if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) $rewrite_status = TRUE;
@@ -262,9 +262,7 @@ elseif ($mode == 'parametres')
 			elseif (config_item('pageurl_type') == 'normal' && is_file(PATH.'.htaccess'))
 				rename(PATH.'.htaccess', PATH.'htaccess.txt');
 			
-			$contenu_config = '<?php $config = '.var_export(config_item(), TRUE).'; ?>';
-			
-			if (write_file(PATH_CNT.'config.php', $contenu_config))
+			if (write_file(PATH_CNT.'config.php', '<?php $config = '.var_export(config_item(), TRUE).'; ?>'))
 				$erreur = 'Configuration modifiée';
 			else
 				$erreur = 'Erreur lors de la modification du fichier de configuration';
