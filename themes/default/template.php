@@ -31,6 +31,20 @@
 			<?php if ($page['page_exists']) : ?>
 				<?php echo $page['content']; ?>
 				
+				<?php if ($namespace == 'Catégorie') : ?>
+					<h2>Pages dans la catégorie « <?php echo $page['title']; ?> »</h2>
+					
+					<?php if (isset($pages_categories[$page['name']])) : ?>
+						<ul>
+						<?php foreach ($pages_categories[$page['name']] as $p) : ?>
+							<li><a href="<?php echo base_path().pageurl(art_title2url($p)); ?>"><?php echo $p; ?></a></li>
+						<?php endforeach; ?>
+						</ul>
+					<?php else : ?>
+						<p>Aucune page dans cette catégorie.</p>
+					<?php endif; ?>
+				<?php endif; ?>
+				
 				<?php if (!empty($page['categories'])) : ?>
 					<div class="categories">
 						<?php echo plural(count($page['categories']), 'Catégorie'); ?> : 

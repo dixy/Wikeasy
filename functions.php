@@ -106,6 +106,12 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if (!$noparse)
 		$page['content'] = parsewiki($page['content']);
 	
+	$categories = cache_pages_categories();
+	foreach ($page['categories'] as $cat)
+		if (!in_array($page['title'], $categories[$cat]))
+			$categories[$cat][] = $page['title'];
+	write_file(PATH_CACHE.'pages_categories', serialize($categories));
+	
 	return write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
 }
 
@@ -501,6 +507,44 @@ function cache_categories($create = FALSE)
     {
         if (!is_file($file))
             cache_categories(CREATE_CACHE);
+        
+        return unserialize(file_get_contents($file));
+    }
+}
+
+/**
+ *  Création du fichier de cache faisant le lien entre les pages et les catégories.
+ */
+function cache_pages_categories($create = FALSE)
+{
+    $file = PATH_CACHE.'pages_categories';
+    
+    if ($create == CREATE_CACHE)
+    {
+        $cats = array();
+        
+        $dir = dir(PATH_PG.config_item('namespace_defaut'));
+        while (($page = $dir->read()) !== FALSE)
+        {
+            if ($page[0] != '.')
+            {
+                $contenu = unserialize(file_get_contents($dir->path.'/'.$page));
+                foreach ($contenu['categories'] as $c)
+                {
+                    if (!isset($cats[$c]))
+                        $cats[$c] = array();
+                    $cats[$c][] = $contenu['title'];
+                }
+            }
+        }
+        $dir->close();
+    
+        write_file($file, serialize($cats));
+    }
+    else
+    {
+        if (!is_file($file))
+            cache_pages_categories(CREATE_CACHE);
         
         return unserialize(file_get_contents($file));
     }

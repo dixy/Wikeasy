@@ -503,6 +503,8 @@ elseif ($mode == 'lire')
 		header('HTTP/1.1 404 Not Found');
 		$was_deleted = array_key_exists($page['name'], deleted_articles());
 	}
+	elseif ($namespace == 'Catégorie')
+		$pages_categories = cache_pages_categories();
 	
 	set_title(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$page['title']);
 }
