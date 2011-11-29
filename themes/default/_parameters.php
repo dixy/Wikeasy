@@ -36,7 +36,7 @@
 						<p><label><input type="radio" name="config[pageurl_type]" value="rewrite" <?php if (config_item('pageurl_type') == 'rewrite') echo 'checked="checked" '; ?>/> Adresses simplifiées c'est-à-dire sans <code>index.php?page=</code> (nécessite le mod_rewrite d'Apache).</label></p>
 						<p><label><input type="radio" name="config[pageurl_type]" value="normal" <?php if (config_item('pageurl_type') == 'normal') echo 'checked="checked" '; ?>/> Adresses normales (fonctionne partout)</label></p>
 					<?php else : ?>
-						<p>L'URL rewriting n'est pas activé chez votre hébergeur, il est donc impossible de l'utiliser pour votre wiki.</p>
+						<p>L'URL rewriting ne semble pas activée chez votre hébergeur, il est donc impossible de l'utiliser pour votre wiki.</p>
 					<?php endif; ?>
 				</fieldset>
 				<p class="center">

@@ -211,9 +211,9 @@ function install()
 		mkdir($dossier.'/historique', 0777);
 		mkdir($dossier.'/suppressions', 0777);
 		mkdir($dossier.'/pages/Principal', 0777);
-		mkdir($dossier.'/pages/Catégorie', 0777);
+		mkdir($dossier.'/pages/'.NS_CATEGORIES, 0777);
 		mkdir($dossier.'/historique/Principal', 0777);
-		mkdir($dossier.'/historique/Catégorie', 0777);
+		mkdir($dossier.'/historique/'.NS_CATEGORIES, 0777);
 		$config = array(
 			'page_defaut' => 'Accueil', 'utilisateur' => 'admin', 'nom_wiki' => 'Wikeasy', 'theme' => 'default',
 			'pageurl_type' => 'normal', 'salt' => uniqid(mt_rand(), TRUE), 'version' => VERSION, 
@@ -228,8 +228,11 @@ function install()
 		redirect();
 	}
 	else
-		exit('Le dossier <strong>content</strong> du wiki n\'est pas accessible en &eacute;criture. Le dossier doit avoir un '.
-			 'chmod de 777 pour pouvoir cr&eacute;er le dossier contenant les pages ainsi que le fichier de configuration.');
+	{
+		header('Content-type: text/plain; charset=utf-8');
+		exit("Le dossier content du wiki n'est pas accessible en écriture.\nLe dossier doit avoir un ".
+			 "chmod de 777 pour pouvoir créer le dossier contenant les pages ainsi que le fichier de configuration.");
+	}
 }
 
 /**

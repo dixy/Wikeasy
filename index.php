@@ -9,18 +9,15 @@ error_reporting(E_ALL);
 define('VERSION', '0.5-dev');
 
 /*
-*	Définition des constantes des chemins.
-*
-*	PATH		Chemin absolu du script
-*	PATH_PG		Chemin absolu du dossier contenant les pages.
+*	Configuration de Wikeasy.
 */
 
-define('PATH', 		dirname(__FILE__).'/');
-define('PATH_CNT',	PATH.'content/');
-define('PATH_PG',	PATH_CNT.'pages/');
-define('PATH_CACHE',PATH_CNT.'cache/');
+define('PATH',      dirname(__FILE__).'/'); //Chemin absolu du script.
+define('PATH_CNT',  PATH.'content/');       //Dossier contenant toutes les données.
+define('PATH_PG',   PATH_CNT.'pages/');     //Contient les fichiers des pages.
+define('PATH_CACHE',PATH_CNT.'cache/');     //Données mises en cache pour accélérer certains traitements.
 
-define('NS_CATEGORIES', 'Catégorie');
+define('NS_CATEGORIES', 'Catégorie');       //Nom de l'espace de nom des catégories.
 
 
 /*
