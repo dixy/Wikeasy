@@ -411,6 +411,9 @@ elseif ($mode == 'supprimer')
 			
 			if (write_file(PATH_CNT.'suppressions/'.$namespace.'/'.$page['name'], serialize($pagedeleted)))
 			{
+				$pages_categories = reset_page_categories(cache_pages_categories(), $namespace, $page['name']);
+				write_file(PATH_CACHE.'pages_categories', serialize($pages_categories));
+				
 				delete_history($page['name'], $namespace);
 				unlink(PATH_PG.$namespace.'/'.$page['name'].'.txt');
 				

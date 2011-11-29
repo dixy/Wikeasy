@@ -106,7 +106,7 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if (!$noparse)
 		$page['content'] = parsewiki($page['content']);
 	
-	$categories = cache_pages_categories();
+	$categories = reset_page_categories(cache_pages_categories(), $ns, $page['name']);
 	foreach ($page['categories'] as $cat)
 		if (!in_array($page['title'], $categories[$cat]))
 			$categories[$cat][] = $page['title'];
@@ -548,6 +548,27 @@ function cache_pages_categories($create = FALSE)
         
         return unserialize(file_get_contents($file));
     }
+}
+
+/**
+ *  Retourne le tableau contenant l'association catégories <> pages, en retirant
+ *  la page de toutes les catégories dans lesquelles elle est actuellement.
+ *
+ *  @param array $categories
+ *  @param string $namespace
+ *  @param string $page
+ */
+function reset_page_categories($categories, $namespace, $pagename)
+{
+    $page = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$pagename.'.txt'));
+    
+    foreach ($page['categories'] as $cat)
+    {
+        $key = array_search($page['title'], $categories[$cat]);
+        unset($categories[$cat][$key]);
+    }
+    
+    return $categories;
 }
 
 /* End of file functions.php */
