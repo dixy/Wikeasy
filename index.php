@@ -20,6 +20,8 @@ define('PATH_CNT',	PATH.'content/');
 define('PATH_PG',	PATH_CNT.'pages/');
 define('PATH_CACHE',PATH_CNT.'cache/');
 
+define('NS_CATEGORIES', 'Catégorie');
+
 
 /*
 *	Chargement des fonctions.
@@ -132,7 +134,7 @@ if ($mode == 'modifier')
 		set_title(($page['page_exists'] ? 'Modification' : 'Création').' de "'.$page['title'].'"');
 		$categories = cache_categories();
 		
-		if ($namespace == 'Catégorie')
+		if ($namespace == NS_CATEGORIES)
 			unset($categories[$page['name']]);
 		
 		if (!empty($_GET['r']))
@@ -185,7 +187,7 @@ if ($mode == 'modifier')
 					
 					if (create_file($page, $namespace))
 					{
-						if ($namespace == 'Catégorie')
+						if ($namespace == NS_CATEGORIES)
 							cache_categories(CREATE_CACHE);
 						generate_cache_list($namespace);
 						redirect($page['pageurl'].(isset($page['redirect']) ? pageurl('&', '?').'redirect=no' : ''));
@@ -412,7 +414,7 @@ elseif ($mode == 'supprimer')
 				delete_history($page['name'], $namespace);
 				unlink(PATH_PG.$namespace.'/'.$page['name'].'.txt');
 				
-				if ($namespace == 'Catégorie')
+				if ($namespace == NS_CATEGORIES)
 					cache_categories(CREATE_CACHE);
 				
 				save_last_change($page['title'], $namespace, 0, array('delete' => 1));
@@ -475,7 +477,7 @@ elseif ($mode == 'suppressions')
 						generate_cache_list($undelete['namespace']);
 						generate_deleted_articles_cache();
 						
-						if ($undelete['namespace'] == 'Catégorie')
+						if ($undelete['namespace'] == NS_CATEGORIES)
 							cache_categories(CREATE_CACHE);
 						
 						redirect(base_path().
@@ -503,7 +505,7 @@ elseif ($mode == 'lire')
 		header('HTTP/1.1 404 Not Found');
 		$was_deleted = array_key_exists($page['name'], deleted_articles());
 	}
-	elseif ($namespace == 'Catégorie')
+	elseif ($namespace == NS_CATEGORIES)
 		$pages_categories = cache_pages_categories();
 	
 	set_title(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$page['title']);

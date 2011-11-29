@@ -31,7 +31,7 @@
 			<?php if ($page['page_exists']) : ?>
 				<?php echo $page['content']; ?>
 				
-				<?php if ($namespace == 'Catégorie') : ?>
+				<?php if ($namespace == NS_CATEGORIES) : ?>
 					<h2>Pages dans la catégorie « <?php echo $page['title']; ?> »</h2>
 					
 					<?php if (isset($pages_categories[$page['name']])) : ?>

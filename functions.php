@@ -491,7 +491,7 @@ function cache_categories($create = FALSE)
     if ($create == CREATE_CACHE)
     {
         $cats = array();
-        $dir = dir(PATH_PG.'Catégorie');
+        $dir = dir(PATH_PG.NS_CATEGORIES);
         while (($cat = $dir->read()) !== FALSE)
         {
             if ($cat[0] != '.')
