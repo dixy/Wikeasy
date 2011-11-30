@@ -276,10 +276,10 @@ elseif ($mode == 'liste')
 	
 	$ns = config_item('namespace_defaut');
 	
-	if (!is_file(PATH_CACHE.$ns.'_articles.php'))
+	if (!is_file(PATH_CACHE.$ns.'_pages'))
 		generate_cache_list($ns);
 	
-	require PATH_CACHE.$ns.'_articles.php';
+	$liste_pages = unserialize(file_get_contents(PATH_CACHE.$ns.'_pages'));
 }
 elseif ($mode == 'historique')
 {

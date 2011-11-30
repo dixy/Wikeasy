@@ -122,15 +122,15 @@
 			<p>Revenir à la page <a href="<?php echo $page['pageurl']; ?>"><?php echo $page['title']; ?></a></p>
 			<?php endif; ?>
 		<?php elseif ($mode == 'liste') : ?>
-			<h1>Liste des articles</h1>
-			<?php if (empty($list_articles)) : ?>
-				<p>Aucun article trouvé.</p>
+			<h1>Liste des pages</h1>
+			<?php if (empty($liste_pages)) : ?>
+				<p>Aucune page trouvée.</p>
 			<?php else : ?>
-				<p><?php echo count($list_articles).' '.plural(count($list_articles), 'article trouvé', 'articles trouvés').'.'; ?></p>
+				<p><?php echo count($liste_pages).' '.plural(count($liste_pages), 'page trouvée', 'pages trouvées').'.'; ?></p>
 				
 				<?php
 				$derniere_lettre = '';
-				foreach ($list_articles as $title)
+				foreach ($liste_pages as $title)
 				{
 					$lettre = strtoupper(substr($title, 0, 1));
 					if ($lettre != $derniere_lettre)

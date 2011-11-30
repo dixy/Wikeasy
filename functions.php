@@ -160,11 +160,11 @@ function write_file($name, $content = '')
 }
 
 /**
- *	Créé le fichier de cache contenant la liste des articles.
+ *	Créé le fichier de cache contenant la liste des pages.
  */
 function generate_cache_list($namespace)
 {
-	$list_articles = array();
+	$pages = array();
 	
 	$dossier = dir(PATH_PG.$namespace);
 	while (($page = $dossier->read()) !== FALSE)
@@ -173,15 +173,14 @@ function generate_cache_list($namespace)
 		{
 			$contenu_page = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$page));
 			if (!isset($contenu_page['redirect']))
-				$list_articles[] = $contenu_page['title'];
+				$pages[] = $contenu_page['title'];
 		}
 	}
 	$dossier->close();
 	
-	natcasesort($list_articles);
+	natcasesort($pages);
 		
-	write_file(PATH_CACHE.$namespace.'_articles.php', 
-		'<?php $list_articles = '.var_export($list_articles, TRUE).';');
+	write_file(PATH_CACHE.$namespace.'_pages', serialize($pages));
 }
 
 /**
