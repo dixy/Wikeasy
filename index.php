@@ -362,7 +362,7 @@ elseif ($mode == 'renommer')
 						
 						$oldpage['lastversion'] = 0;
 						$oldpage['content'] = '#REDIRECT [['.$page['title'].']]';
-						create_file($oldpage, FALSE, TRUE, FALSE);
+						create_file($oldpage, $namespace, FALSE, TRUE, FALSE);
 						
 						save_last_change($page['title'], $namespace, 0, array('oldname' => $oldpage['title']));
 						

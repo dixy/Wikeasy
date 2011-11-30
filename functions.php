@@ -93,7 +93,7 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	
 	if (substr($page['content'], 0, 9) == '#REDIRECT')
 		if (preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $page['content'], $r))
-			$page['redirect'] = art_title2url(clean_title($r[1]));
+			$page['redirect'] = ($ns != config_item('namespace_defaut') ? $ns.':' : '').art_title2url(clean_title($r[1]));
 	
 	if ($createrevision)
 	{
@@ -105,11 +105,14 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if (!$noparse)
 		$page['content'] = parsewiki($page['content']);
 	
-	$categories = reset_page_categories(cache_pages_categories(), $ns, $page['name']);
-	foreach ($page['categories'] as $cat)
-		if (!in_array($page['title'], $categories[$cat]))
-			$categories[$cat][] = $page['title'];
-	write_file(PATH_CACHE.'pages_categories', serialize($categories));
+	if (!isset($page['redirect']))
+	{
+		$categories = reset_page_categories(cache_pages_categories(), $ns, $page['name']);
+		foreach ($page['categories'] as $cat)
+			if (!in_array($page['title'], $categories[$cat]))
+				$categories[$cat][] = $page['title'];
+		write_file(PATH_CACHE.'pages_categories', serialize($categories));
+	}
 	
 	return write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
 }
@@ -533,9 +536,12 @@ function cache_pages_categories($create = FALSE)
                 $contenu = unserialize(file_get_contents($dir->path.'/'.$page));
                 foreach ($contenu['categories'] as $c)
                 {
-                    if (!isset($cats[$c]))
-                        $cats[$c] = array();
-                    $cats[$c][] = $contenu['title'];
+                    if (!isset($contenu['redirect']))
+                    {
+                        if (!isset($cats[$c]))
+                            $cats[$c] = array();
+                        $cats[$c][] = $contenu['title'];
+                    }
                 }
             }
         }
