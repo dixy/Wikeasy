@@ -334,6 +334,12 @@ elseif ($mode == 'historique')
 		{
 			if ($oldid != $recentid)
 			{
+				if ($recentid < $oldid)
+				{
+					$oldid = $recentid;
+					$recentid = (int)$_REQUEST['oldid'];
+				}
+				
 				require PATH.'diffengine.php';
 				$diff_result = new Diff(explode("\n", file_get_contents($path.'/'.$oldid.'.txt')), 
 										explode("\n", file_get_contents($path.'/'.$recentid.'.txt')));
