@@ -1,6 +1,6 @@
 			<h1>Paramètres</h1>
 			<form method="post" action="<?php echo base_path(); ?>index.php?a=parametres" accept-charset="utf-8"><?php
-				if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>';
+				if (isset($erreurs) && $erreurs) echo '<p class="erreur">'.implode('<br />', $erreurs).'</p>';
 				if (isset($message)) echo '<p class="message">'.$message.'</p>'; ?>
 
 				<fieldset>

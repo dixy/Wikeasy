@@ -242,32 +242,56 @@ elseif ($mode == 'parametres')
 	
 	if (!empty($_POST['config']) && !empty($_POST['_cfgnonce']))
 	{
+		$erreurs = array();
+		
 		if (verify_nonce('modify-configuration', $_POST['_cfgnonce']))
 		{
-			if (!empty($_POST['config']['motdepasse']) && strlen(trim($_POST['config']['motdepasse'])) >= 6)
-				config_item('motdepasse', hash('sha256', config_item('salt').$_POST['config']['motdepasse']));
-			
-			if (empty($_POST['config']['theme']) || !in_array($_POST['config']['theme'], $liste_themes))
-				$_POST['config']['theme'] = config_item('theme');
-			
-			$_POST['config']['nombre_modifs_recentes'] = intval($_POST['config']['nombre_modifs_recentes']);
-			$_POST['config']['proteger_pages'] = isset($_POST['config']['proteger_pages']) ? 1 : 0;
-			
-			foreach (config_item() as $key => $value)
-				if (isset($_POST['config'][$key]) && $key != 'motdepasse')
-					config_item($key, $_POST['config'][$key]);
-			
-			if (config_item('pageurl_type') == 'rewrite' && is_file(PATH.'htaccess.txt'))
-				rename(PATH.'htaccess.txt', PATH.'.htaccess');
-			elseif (config_item('pageurl_type') == 'normal' && is_file(PATH.'.htaccess'))
-				rename(PATH.'.htaccess', PATH.'htaccess.txt');
-			
-			if (write_file(PATH_CNT.'config.php', '<?php $config = '.var_export(config_item(), TRUE).'; ?>'))
-				$message = 'Configuration modifiée';
-			else
-				$erreur = 'Erreur lors de la modification du fichier de configuration';
+            $cfg = array_map('trim', $_POST['config']);
+            
+            if (!isset($cfg['nom_wiki']) || mb_strlen($cfg['nom_wiki']) <= 1 || mb_strlen($cfg['nom_wiki']) > 54)
+                $erreurs[] = 'Le nom du wiki doit être compris entre 2 et 54 caractères.';
+            
+            if (!isset($cfg['theme']) || !in_array($cfg['theme'], $liste_themes))
+                $erreurs[] = 'Le thème sélectionné n\'existe pas.';
+            
+            if (!isset($cfg['nombre_modifs_recentes']) || !ctype_digit($cfg['nombre_modifs_recentes']) || $cfg['nombre_modifs_recentes'] < 10)
+                $erreurs[] = 'Le nombre de modifications récentes doit être un nombre entier supérieur à 10.';
+            
+            if (!isset($cfg['utilisateur']) || mb_strlen($cfg['utilisateur']) <= 1 || mb_strlen($cfg['utilisateur']) > 20)
+                $erreurs[] = 'Le nom d\'utilisateur doit être compris entre 2 et 20 caractères.';
+            
+            if (!empty($cfg['motdepasse']) && mb_strlen($cfg['motdepasse']) < 6)
+                $erreurs[] = 'Le mot de passe doit faire au minimum 6 caractères de long.';
+            
+            if (isset($cfg['pageurl_type']) && !in_array($cfg['pageurl_type'], array('rewrite', 'normal')))
+                $erreurs[] = 'Le type d\'url choisie n\'existe pas.';
+            
+            if (!$erreurs)
+            {
+                config_item('proteger_pages', isset($cfg['proteger_pages']));
+                
+                if ($cfg['motdepasse'] != '')
+                    config_item('motdepasse', hash('sha256', config_item('salt').$cfg['motdepasse']));
+                if (!isset($cfg['pageurl_type']))
+                    $cfg['pageurl_type'] = config_item('pageurl_type');
+                
+                foreach (array('utilisateur', 'nom_wiki', 'theme', 'nombre_modifs_recentes', 'pageurl_type') as $key)
+                    config_item($key, $cfg[$key]);
+                
+                if (write_file(PATH_CNT.'config.php', serialize(config_item())))
+                {
+                    if (config_item('pageurl_type') == 'rewrite' && is_file(PATH.'htaccess.txt'))
+                        rename(PATH.'htaccess.txt', PATH.'.htaccess');
+                    elseif (config_item('pageurl_type') == 'normal' && is_file(PATH.'.htaccess'))
+                        rename(PATH.'.htaccess', PATH.'htaccess.txt');
+                    
+                    $message = 'Configuration modifiée';
+                }
+                else
+                    $erreurs[] = 'Erreur lors de la modification du fichier de configuration';
+            }
 		}
-		else $erreur = 'L\'opération n\'a pas pu être validée.';
+		else $erreurs[] = 'L\'opération n\'a pas pu être validée.';
 	}
 }
 elseif ($mode == 'liste')
