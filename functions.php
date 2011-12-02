@@ -449,14 +449,9 @@ function config_item($item = '', $newval = '')
 {
 	static $_config = array();
 	
-	if (empty($_config))
+	if (empty($_config) && is_file(PATH_CNT.'config.php'))
 	{
-		if (is_file(PATH_CNT.'config.php'))
-		{
-			require PATH_CNT.'config.php';
-			
-			$_config = $config;
-		}
+		$_config = unserialize(substr(file_get_contents(PATH_CNT.'config.php'), 9, -3));
 	}
 	
 	if ($item != '' && $newval !== '')

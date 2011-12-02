@@ -278,7 +278,7 @@ elseif ($mode == 'parametres')
                 foreach (array('utilisateur', 'nom_wiki', 'theme', 'nombre_modifs_recentes', 'pageurl_type') as $key)
                     config_item($key, $cfg[$key]);
                 
-                if (write_file(PATH_CNT.'config.php', serialize(config_item())))
+                if (write_file(PATH_CNT.'config.php', '<?php /* '.serialize(config_item()).' */'))
                 {
                     if (config_item('pageurl_type') == 'rewrite' && is_file(PATH.'htaccess.txt'))
                         rename(PATH.'htaccess.txt', PATH.'.htaccess');
