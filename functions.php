@@ -220,7 +220,7 @@ function install()
 			'pageurl_type' => 'normal', 'salt' => uniqid(mt_rand(), TRUE), 'version' => VERSION, 
 			'nombre_modifs_recentes' => 50, 'proteger_pages' => 0, 'namespace_defaut' => 'Principal');
 		$config['motdepasse'] = hash('sha256', $config['salt'].'123456');
-		write_file($dossier.'/config.php', '<?php $config = '.var_export($config, TRUE).';');
+		write_file($dossier.'/config.php', '<?php /* '.serialize($config).' */');
 		create_file(array(
 			'name' => 'Accueil', 'title' => 'Accueil', 'content' => "L'installation s'est bien déroulée.\n\nVos ".
 			"identifiants de connexion sont __admin__ et __123456__.%%%\nVous pouvez modifier ces informations en ".

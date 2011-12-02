@@ -42,14 +42,17 @@ function up_template($titre, $contenu)
 	</head>
 	<body>
 		<div id="header"><h1>Wikeasy - Mise à jour</h1></div>
-		<div id="content"><h2><?php echo $titre; ?></h2><div id="incontent"><?php echo $contenu; ?></div></div>
+		<div id="content">
+			<h2><?php echo $titre; ?></h2>
+			<div id="incontent"><?php echo $contenu; ?></div>
+		</div>
 	</body>
 </html><?php exit;
 }
 
 function write_config($config)
 {
-	$contenu_config = '<?php $config = '.var_export($config, true).';';
+	$contenu_config = '<?php /* '.serialize($config).' */';
 	
 	if (!write_file(PATH_CNT.'config.php', $contenu_config))
 		up_template('Erreur', 'Erreur lors de la modification du fichier de configuration. '.
@@ -57,13 +60,19 @@ function write_config($config)
 }
 
 /*
-*	Inclusion de la configuration.
+*	Récupération de la configuration.
 */
 
 if (!is_dir(PATH_PG) || !is_file(PATH_CNT.'config.php'))
-	up_template('Erreur', 'Votre wiki n\'est pas installé. Éxécutez index.php pour l\'installer.');
+	up_template('Erreur', 'Votre wiki n\'est pas installé. Exécutez index.php pour l\'installer.');
 
-require PATH_CNT.'config.php';
+$_cfg = file_get_contents(PATH_CNT.'config.php');
+
+if ($_cfg[6] == '/')
+    $config = unserialize(substr($_cfg, 9, -3));
+else
+    require PATH_CNT.'config.php';
+unset($_cfg);
 
 if (!isset($config['version'])) $config['version'] = '0.2';
 
@@ -82,7 +91,7 @@ foreach ($possible_update as $k => $version)
 {
 	if ($version == $current)
 	{
-		$next_version = isset($possible_update[$k+1]) ? $possible_update[$k+1] : VERSION;
+		$next_version = isset($possible_update[$k + 1]) ? $possible_update[$k + 1] : VERSION;
 		$config['version'] = $next_version;
 		$messages[] = call_user_func('up_'.str_replace('.', '', $current).'_to_'.str_replace('.', '', $next_version));
 		write_config($config);
@@ -100,8 +109,8 @@ function up_02_to_03()
 	$config['nombre_modifs_recentes'] = 50;
 	$config['motdepasse'] = hash('sha256', '123456');
 	
-	$dir = opendir(PATH_PG);
-	while ($p = readdir($dir))
+	$dir = dir(PATH_PG);
+	while (($p = $dir->read()) !== FALSE)
 	{
 		if (substr($p, -3) == 'xml')
 		{
@@ -111,7 +120,7 @@ function up_02_to_03()
 			create_file($page, '', FALSE, FALSE);
 		}
 	}
-	closedir($dir);
+	$dir->close();
 	
 	return '<strong>Attention</strong> Le mot de passe administrateur a été changé. Le nouveau mot de passe est <strong>123456</strong>.'.
 			'Il est conseillé de le changer dès maintenant.';
