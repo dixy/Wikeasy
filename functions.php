@@ -52,7 +52,7 @@ function clean_title($url)
  */
 function get_page($nom, $namespace = '')
 {
-    if ($namespace == '')
+	if ($namespace == '')
 		$namespace = config_item('namespace_defaut');
 	
 	$return = array(
@@ -485,30 +485,30 @@ function show_error($message, $heading = 'Erreur', $back_index = TRUE)
  */
 function cache_categories($create = FALSE)
 {
-    $file = PATH_CACHE.'categories';
-    
-    if ($create == CREATE_CACHE)
-    {
-        $cats = array();
-        $dir = dir(PATH_PG.NS_CATEGORIES);
-        while (($cat = $dir->read()) !== FALSE)
-        {
-            if ($cat[0] != '.')
-            {
-                $cat = substr($cat, 0, strpos($cat, '.'));
-                $cats[$cat] = art_title($cat);
-            }
-        }
-        $dir->close();
-        write_file($file, serialize($cats));
-    }
-    else
-    {
-        if (!is_file($file))
-            cache_categories(CREATE_CACHE);
-        
-        return unserialize(file_get_contents($file));
-    }
+	$file = PATH_CACHE.'categories';
+	
+	if ($create == CREATE_CACHE)
+	{
+		$cats = array();
+		$dir = dir(PATH_PG.NS_CATEGORIES);
+		while (($cat = $dir->read()) !== FALSE)
+		{
+			if ($cat[0] != '.')
+			{
+				$cat = substr($cat, 0, strpos($cat, '.'));
+				$cats[$cat] = art_title($cat);
+			}
+		}
+		$dir->close();
+		write_file($file, serialize($cats));
+	}
+	else
+	{
+		if (!is_file($file))
+			cache_categories(CREATE_CACHE);
+		
+		return unserialize(file_get_contents($file));
+	}
 }
 
 /**
@@ -516,40 +516,40 @@ function cache_categories($create = FALSE)
  */
 function cache_pages_categories($create = FALSE)
 {
-    $file = PATH_CACHE.'pages_categories';
-    
-    if ($create == CREATE_CACHE)
-    {
-        $cats = array();
-        
-        $dir = dir(PATH_PG.config_item('namespace_defaut'));
-        while (($page = $dir->read()) !== FALSE)
-        {
-            if ($page[0] != '.')
-            {
-                $contenu = unserialize(file_get_contents($dir->path.'/'.$page));
-                foreach ($contenu['categories'] as $c)
-                {
-                    if (!isset($contenu['redirect']))
-                    {
-                        if (!isset($cats[$c]))
-                            $cats[$c] = array();
-                        $cats[$c][] = $contenu['title'];
-                    }
-                }
-            }
-        }
-        $dir->close();
-    
-        write_file($file, serialize($cats));
-    }
-    else
-    {
-        if (!is_file($file))
-            cache_pages_categories(CREATE_CACHE);
-        
-        return unserialize(file_get_contents($file));
-    }
+	$file = PATH_CACHE.'pages_categories';
+	
+	if ($create == CREATE_CACHE)
+	{
+		$cats = array();
+		
+		$dir = dir(PATH_PG.config_item('namespace_defaut'));
+		while (($page = $dir->read()) !== FALSE)
+		{
+			if ($page[0] != '.')
+			{
+				$contenu = unserialize(file_get_contents($dir->path.'/'.$page));
+				foreach ($contenu['categories'] as $c)
+				{
+					if (!isset($contenu['redirect']))
+					{
+						if (!isset($cats[$c]))
+							$cats[$c] = array();
+						$cats[$c][] = $contenu['title'];
+					}
+				}
+			}
+		}
+		$dir->close();
+	
+		write_file($file, serialize($cats));
+	}
+	else
+	{
+		if (!is_file($file))
+			cache_pages_categories(CREATE_CACHE);
+		
+		return unserialize(file_get_contents($file));
+	}
 }
 
 /**
@@ -562,15 +562,15 @@ function cache_pages_categories($create = FALSE)
  */
 function reset_page_categories($categories, $namespace, $pagename)
 {
-    $page = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$pagename.'.txt'));
-    
-    foreach ($page['categories'] as $cat)
-    {
-        $key = array_search($page['title'], $categories[$cat]);
-        unset($categories[$cat][$key]);
-    }
-    
-    return $categories;
+	$page = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$pagename.'.txt'));
+	
+	foreach ($page['categories'] as $cat)
+	{
+		$key = array_search($page['title'], $categories[$cat]);
+		unset($categories[$cat][$key]);
+	}
+	
+	return $categories;
 }
 
 /* End of file functions.php */

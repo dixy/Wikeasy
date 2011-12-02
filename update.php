@@ -69,9 +69,9 @@ if (!is_dir(PATH_PG) || !is_file(PATH_CNT.'config.php'))
 $_cfg = file_get_contents(PATH_CNT.'config.php');
 
 if ($_cfg[6] == '/')
-    $config = unserialize(substr($_cfg, 9, -3));
+	$config = unserialize(substr($_cfg, 9, -3));
 else
-    require PATH_CNT.'config.php';
+	require PATH_CNT.'config.php';
 unset($_cfg);
 
 if (!isset($config['version'])) $config['version'] = '0.2';
