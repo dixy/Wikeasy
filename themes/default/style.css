@@ -28,7 +28,7 @@ a img { border: 0; }
 #footer #copyright { float: right; width: 150px; text-align:right; }
 
 /* Formatage des erreurs */
-.erreur, .avertissement {
+.erreur, .avertissement, .message {
     background: url(exclamation.png) 8px 50% no-repeat;
     background-color: #FFE3E3;
     border: 2px solid #D00;
@@ -41,6 +41,13 @@ a img { border: 0; }
     background-color: #FFEBC1;
     color: #A6750C;
     border-color: #FDBF3B;
+}
+
+.message {
+    background-image: url(accept.png);
+    background-color: #DFFFDF;
+    color: #005F00;
+    border-color: #9FCF9F;
 }
 
 /* Mise en page des pages */

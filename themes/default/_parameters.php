@@ -1,34 +1,35 @@
 			<h1>Paramètres</h1>
-			<form method="post" action="<?php echo base_path(); ?>index.php?a=parametres"><?php
-				if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
+			<form method="post" action="<?php echo base_path(); ?>index.php?a=parametres" accept-charset="utf-8"><?php
+				if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>';
+				if (isset($message)) echo '<p class="message">'.$message.'</p>'; ?>
 
 				<fieldset>
 					<legend>Configuration de base</legend>
 					
-					<p><label for="nom_wiki">Nom du wiki :</label></p>
-					<input type="text" name="config[nom_wiki]" id="nom_wiki" value="<?php echo config_item('nom_wiki'); ?>" size="40" />
+					<p><label for="id_nom_wiki">Nom du wiki :</label></p>
+					<input type="text" name="config[nom_wiki]" id="id_nom_wiki" value="<?php echo config_item('nom_wiki'); ?>" size="40" />
 					
-					<p><label for="theme">Thème :</label></p>
-					<select name="config[theme]" id="theme">
+					<p><label for="id_theme">Thème :</label></p>
+					<select name="config[theme]" id="id_theme">
 					<?php if (!empty($liste_themes)) : foreach ($liste_themes as $tnom) : ?>
 						<option value="<?php echo $tnom; ?>"<?php if ($tnom == config_item('theme')) echo ' selected="selected"'; ?>><?php echo $tnom; ?></option>
 					<?php endforeach; endif; ?>
 					</select>
 					
-					<p><label for="nombre_modifs_recentes">Nombre de modifications à conserver dans les <a href="<?php echo base_path(); ?>index.php?a=modifications-recentes">modifications récentes</a> :</label></p>
-					<input type="text" name="config[nombre_modifs_recentes]" id="nombre_modifs_recentes" value="<?php echo config_item('nombre_modifs_recentes'); ?>" size="10" />
+					<p><label for="id_nombre_modifs_recentes">Nombre de modifications à conserver dans les <a href="<?php echo base_path(); ?>index.php?a=modifications-recentes">modifications récentes</a> :</label></p>
+					<input type="text" name="config[nombre_modifs_recentes]" id="id_nombre_modifs_recentes" value="<?php echo config_item('nombre_modifs_recentes'); ?>" size="10" />
 					
-					<p><label for="proteger_pages"><input type="checkbox" name="config[proteger_pages]" id="proteger_pages" <?php if (config_item('proteger_pages')) echo 'checked="checked" '; ?>/> 
+					<p><label for="id_proteger_pages"><input type="checkbox" name="config[proteger_pages]" id="id_proteger_pages" <?php if (config_item('proteger_pages')) echo 'checked="checked" '; ?>/> 
 					Protéger toutes les pages (seuls les utilisateurs connectés pourront les modifier)</label></p>
 				</fieldset>
 				<fieldset>
 					<legend>Compte de l'administrateur</legend>
 					
-					<p><label for="utilisateur">Nom d'utilisateur :</label></p>
-					<input type="text" name="config[utilisateur]" id="utilisateur" value="<?php echo config_item('utilisateur'); ?>" size="40" />
+					<p><label for="id_utilisateur">Nom d'utilisateur :</label></p>
+					<input type="text" name="config[utilisateur]" id="id_utilisateur" value="<?php echo config_item('utilisateur'); ?>" size="40" />
 					
-					<p><label for="motdepasse">Mot de passe (laissez vide pour ne pas changer) :</label></p>
-					<input type="text" name="config[motdepasse]" id="motdepasse" size="40" /> (minimum 6 caractères)
+					<p><label for="id_motdepasse">Mot de passe (laissez vide pour ne pas le changer) :</label></p>
+					<input type="text" name="config[motdepasse]" id="id_motdepasse" size="40" /> (minimum 6 caractères)
 				</fieldset>
 				<fieldset>
 					<legend>Adresses des pages</legend>

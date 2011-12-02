@@ -263,7 +263,7 @@ elseif ($mode == 'parametres')
 				rename(PATH.'.htaccess', PATH.'htaccess.txt');
 			
 			if (write_file(PATH_CNT.'config.php', '<?php $config = '.var_export(config_item(), TRUE).'; ?>'))
-				$erreur = 'Configuration modifiée';
+				$message = 'Configuration modifiée';
 			else
 				$erreur = 'Erreur lors de la modification du fichier de configuration';
 		}
