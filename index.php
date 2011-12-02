@@ -314,11 +314,11 @@ elseif ($mode == 'historique')
 	
 	$versions = array();
 	$path = PATH_CNT.'historique/'.$namespace.'/'.$page['name'];
-	$dir = opendir($path);
-	while ($vers = readdir($dir))
+	$dir = dir($path);
+	while (($vers = $dir->read()) !== FALSE)
 		if ($vers[0] != '.')
 			$versions[substr($vers, 0, strpos($vers, '.'))] = format_date(filemtime($path.'/'.$vers), DT_HOUR);
-	closedir($dir);
+	$dir->close();
 	
 	krsort($versions);
 	
