@@ -174,7 +174,9 @@ if ($mode == 'modifier')
 					else $erreur = 'Vous devez choisir une catégorie.';
 				}
 				elseif (!empty($_POST['previ_page']))
+				{
 					$apercu_page = parsewiki($_POST['contenu_page']);
+				}
 				elseif (!empty($_POST['enreg_page']))
 				{
 					$page['content'] = trim($_POST['contenu_page']);
@@ -186,7 +188,7 @@ if ($mode == 'modifier')
 					{
 						if ($namespace == NS_CATEGORIES)
 							cache_categories(CREATE_CACHE);
-						generate_cache_list($namespace);
+						generate_cache_list($namespace, $page['title']);
 						redirect($page['pageurl'].(isset($page['redirect']) ? pageurl('&', '?').'redirect=no' : ''));
 					}
 					

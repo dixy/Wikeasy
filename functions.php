@@ -161,26 +161,40 @@ function write_file($name, $content = '')
 
 /**
  *	Créé le fichier de cache contenant la liste des pages.
+ *  
+ *  @param string $namespace    Espace de nom dans lequel il faut générer le fichier de cache.
+ *  @param string $pagename     Si un titre de page est renseigné et que le fichier existe, se contente 
+ *      de vérifier si cette page est déjà dans le cache au lieu de recharger toutes les pages.
  */
-function generate_cache_list($namespace)
+function generate_cache_list($namespace, $pagename = '')
 {
+    $cachefile = PATH_CACHE.$namespace.'_pages';
 	$pages = array();
 	
-	$dossier = dir(PATH_PG.$namespace);
-	while (($page = $dossier->read()) !== FALSE)
+	if ($pagename != '' && is_file($cachefile))
 	{
-		if ($page[0] != '.')
-		{
-			$contenu_page = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$page));
-			if (!isset($contenu_page['redirect']))
-				$pages[] = $contenu_page['title'];
-		}
+		$pages = unserialize(file_get_contents($cachefile));
+		if (!in_array($pagename, $pages))
+			$pages[] = $pagename;
 	}
-	$dossier->close();
+	else
+	{
+		$dir = dir(PATH_PG.$namespace);
+		while (($page = $dir->read()) !== FALSE)
+		{
+			if ($page[0] != '.')
+			{
+				$page_content = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$page));
+				if (!isset($page_content['redirect']))
+					$pages[] = $page_content['title'];
+			}
+		}
+		$dir->close();
+	}
 	
 	natcasesort($pages);
 		
-	write_file(PATH_CACHE.$namespace.'_pages', serialize($pages));
+	write_file($cachefile, serialize($pages));
 }
 
 /**
