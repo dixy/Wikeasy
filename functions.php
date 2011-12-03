@@ -48,7 +48,8 @@ function clean_title($url)
 /**
  *	Retourne les informations sur une page.
  *
- *	@param $nom		Nom de la page, si elle n'existe pas retourne des valeurs par défaut.
+ *	@param string $nom  Nom de la page, si elle n'existe pas retourne des valeurs par défaut.
+ *  @param string $namespace
  */
 function get_page($nom, $namespace = '')
 {
@@ -59,7 +60,7 @@ function get_page($nom, $namespace = '')
 		'name' => $nom,
 		'title' => art_title($nom),
 		'content' => '',
-		'pageurl' => pageurl(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').art_title2url($nom)),
+		'pageurl' => pageurl(ns_name($namespace).art_title2url($nom)),
 		'status' => 'public',
 		'lastmodif' => '',
 		'lastversion' => 0,
@@ -72,8 +73,7 @@ function get_page($nom, $namespace = '')
 	{
 		$return = unserialize(file_get_contents($nom_fichier));
 		$return['page_exists'] = TRUE;
-		$return['pageurl'] = base_path().pageurl(($namespace != config_item('namespace_defaut')
-									? $namespace.':' : '').art_title2url($return['title']));
+		$return['pageurl'] = base_path().pageurl(ns_name($namespace).art_title2url($return['title']));
 	}
 	
 	return $return;
@@ -93,7 +93,7 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	
 	if (substr($page['content'], 0, 9) == '#REDIRECT')
 		if (preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $page['content'], $r))
-			$page['redirect'] = ($ns != config_item('namespace_defaut') ? $ns.':' : '').art_title2url(clean_title($r[1]));
+			$page['redirect'] = ns_name($ns).art_title2url(clean_title($r[1]));
 	
 	if ($createrevision)
 	{
@@ -238,9 +238,9 @@ function install()
 		$config['motdepasse'] = hash('sha256', $config['salt'].'123456');
 		write_file($dossier.'/config.php', '<?php /* '.serialize($config).' */');
 		create_file(array(
-			'name' => 'Accueil', 'title' => 'Accueil', 'content' => "L'installation s'est bien déroulée.\n\nVos ".
-			"identifiants de connexion sont __admin__ et __123456__.%%%\nVous pouvez modifier ces informations en ".
-			"vous connectant.", 
+			'name' => 'Accueil', 'title' => 'Accueil', 'content' => "L'installation s'est bien déroulée.".
+			"\n\nVos identifiants de connexion sont __admin__ et __123456__.%%%\nVous pouvez modifier ".
+			"ces informations en vous connectant.", 
 			'status' => 'public', 'lastversion' => 0));
 		redirect();
 	}
@@ -386,8 +386,8 @@ function format_date($date, $hour = FALSE, $interval = FALSE)
 
 /**
  *	Supprime tout l'historique d'un article.
- *	@param	(string) $page		Nom de la page.
- *	@param	(bool)	 $dirtoo	S'il faut aussi supprimer le dossier.
+ *	@param string $page		Nom de la page.
+ *	@param bool   $dirtoo	S'il faut aussi supprimer le dossier.
  */
 function delete_history($page, $namespace, $dirtoo = TRUE)
 {
@@ -407,9 +407,9 @@ function delete_history($page, $namespace, $dirtoo = TRUE)
 
 /**
  *	Retourne un mot au singulier ou pluriel suivant le nombre $nbr
- *	@param	(int)		$nbr	Nombre à tester
- *	@param	(string)	$sing	Singulier du mot ou de la phrase
- *	@param	(string)	$plu	Pluriel à retourner (facultatif)
+ *	@param int    $nbr	Nombre à tester
+ *	@param string $sing	Singulier du mot ou de la phrase
+ *	@param string $plu	Pluriel à retourner (facultatif)
  */
 function plural($nbr, $sing, $plu = NULL)
 {
@@ -434,7 +434,7 @@ function generate_deleted_articles_cache()
 			{
 				while (($art = $nsdir->read()) !== FALSE)
 					if ($art[0] != '.')
-						$deleted[($ns != config_item('namespace_defaut') ? $ns.':' : '').$art] = $ns.'/'.$art;
+						$deleted[ns_name($ns).$art] = $ns.'/'.$art;
 				$nsdir->close();
 			}
 		}
@@ -499,7 +499,7 @@ function show_error($message, $heading = 'Erreur', $back_index = TRUE)
 /**
  *  Création du fichier de cache de la liste des catégories.
  */
-function cache_categories($create = FALSE)
+function cache_categories()
 {
 	$file = PATH_CACHE.NS_CATEGORIES.'_pages';
 	
@@ -511,6 +511,8 @@ function cache_categories($create = FALSE)
 
 /**
  *  Création du fichier de cache faisant le lien entre les pages et les catégories.
+ *  
+ *  @param bool $create  S'il faut créer le fichier de cache au lieu de le retourner.
  */
 function cache_pages_categories($create = FALSE)
 {
@@ -569,6 +571,14 @@ function reset_page_categories($categories, $namespace, $pagename)
 	}
 	
 	return $categories;
+}
+
+/**
+ *  Retourne "namespace:" s'il est différent du namespace par défaut.
+ */
+function ns_name($ns)
+{
+	return ($ns != config_item('namespace_defaut') ? $ns.':' : '');
 }
 
 /* End of file functions.php */

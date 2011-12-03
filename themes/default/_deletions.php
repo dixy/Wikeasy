@@ -1,4 +1,4 @@
-	<?php if (isset($undelete)) : $title = ($undelete['namespace'] != config_item('namespace_defaut') ? $undelete['namespace'].':' : '').$undelete['title']; ?><h1>Restaurer une page supprimée</h1>
+	<?php if (isset($undelete)) : $title = ns_name($undelete['namespace']).$undelete['title']; ?><h1>Restaurer une page supprimée</h1>
 			<?php if (isset($erreur)) : ?><p class="erreur"><?php echo $erreur; ?></p><?php endif; ?>
 
 			
@@ -39,7 +39,7 @@
 				<?php foreach ($pages_deleted as $name => $article) : ?>
 
 				<li><a href="<?php echo base_path().'index.php?a=suppressions&amp;r='.$name; ?>"><?php 
-				echo ($article['namespace'] != config_item('namespace_defaut') ? $article['namespace'].':' : '').$article['title']; 
+				echo ns_name($article['namespace']).$article['title']; 
 				?></a> supprimée le <?php echo format_date($article['deletetime'], DT_HOUR); 
 				if ($article['isredirect']) : ?> <em>(redirection)</em><?php endif; ?></li><?php endforeach; ?>
 

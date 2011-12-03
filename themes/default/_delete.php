@@ -3,7 +3,7 @@
 				if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
 
 				<p>
-					Êtes-vous sûr de vouloir supprimer la page « <strong><?php echo ($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$page['title']; ?></strong> » ?
+					Êtes-vous sûr de vouloir supprimer la page « <strong><?php echo ns_name($namespace).$page['title']; ?></strong> » ?
 					<input type="hidden" name="_delnonce" value="<?php echo create_nonce('delete-page'); ?>" />
 				</p>
 				<input type="submit" value="Supprimer" name="suppr_ok" class="submit" /> 

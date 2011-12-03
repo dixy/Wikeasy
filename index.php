@@ -397,7 +397,7 @@ elseif ($mode == 'renommer')
 						save_last_change($page['title'], $namespace, 0, array('oldname' => $oldpage['title']));
 						
 						generate_cache_list($namespace);
-						redirect(base_path().pageurl(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').art_title2url($page['title'])));
+						redirect(base_path().pageurl(ns_name($namespace).art_title2url($page['title'])));
 					} else $erreur = 'Erreur lors du renommage de l\'article.';
 				} else $erreur = 'Le nouveau titre choisi est déjà utilisé.';
 			} else $erreur = 'Le nouveau titre est soit trop court soit trop long (maximum 64 caractères).';
@@ -503,7 +503,7 @@ elseif ($mode == 'suppressions')
 						generate_deleted_articles_cache();
 						
 						redirect(base_path().
-								pageurl(($undelete['namespace'] != config_item('namespace_defaut') ? $undelete['namespace'].':' : '').art_title2url($page['name'])).
+								pageurl(ns_name($undelete['namespace']).art_title2url($page['name'])).
 								($undelete['isredirect'] ? pageurl('&', '?').'redirect=no' : ''));
 					}
 					else $erreur = 'Le nom de l\'article n\'a pas été renseigné, ou un article du même nom existe déjà.';
@@ -530,7 +530,7 @@ elseif ($mode == 'lire')
 	elseif ($namespace == NS_CATEGORIES)
 		$pages_categories = cache_pages_categories();
 	
-	set_title(($namespace != config_item('namespace_defaut') ? $namespace.':' : '').$page['title']);
+	set_title(ns_name($namespace).$page['title']);
 }
 
 
