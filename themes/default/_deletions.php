@@ -14,7 +14,7 @@
 
 			</fieldset>
 			
-			<form method="post" action="<?php echo base_path(); ?>index.php?a=suppressions&amp;r=<?php echo $_GET['r']; ?>">
+			<form method="post" action="<?php echo base_path(); ?>index.php?a=suppressions&amp;r=<?php echo $_GET['r']; ?>" accept-charset="utf-8">
 				<input type="hidden" name="_undelnonce" value="<?php echo create_nonce('undelete-page'); ?>" />
 				<?php if ($check_exists) : ?>
 					<p>

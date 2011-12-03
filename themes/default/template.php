@@ -68,7 +68,7 @@
 			<?php if (check_access($page)) : ?>
 			<h1><?php echo ($page['page_exists'] ? 'Modification' : 'Création'); ?> de <?php echo $page['title']; ?></h1>
 			
-			<form method="post" action="<?php echo $page['pageurl'].$and.'a=modifier'; ?>">
+			<form method="post" action="<?php echo $page['pageurl'].$and.'a=modifier'; ?>" accept-charset="utf-8">
 				<?php if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
 
 				<div class="formulaire_modif">
@@ -145,7 +145,7 @@
 			endif; ?>
 		<?php elseif ($mode == 'connexion') : ?>
 			<h1>Connexion</h1>
-			<form method="post" action="<?php echo base_path(); ?>index.php?a=connexion">
+			<form method="post" action="<?php echo base_path(); ?>index.php?a=connexion" accept-charset="utf-8">
 				<?php if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
 
 				<div class="bloc_connexion">
@@ -210,7 +210,7 @@
 				</p>
 				
 				<?php if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
-				<form method="post" action="<?php echo $page['pageurl'].$and.'a=historique'; ?>">
+				<form method="post" action="<?php echo $page['pageurl'].$and.'a=historique'; ?>" accept-charset="utf-8">
 					<?php if ($nbr > 1) : ?><p><input type="submit" value="Comparer les versions sélectionnées" class="submit" /></p><?php endif; ?>
 					<table border="1"><thead><tr>
 						<th>Numéro</th>

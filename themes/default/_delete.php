@@ -1,5 +1,5 @@
 	<h1>Supprimer une page</h1>
-			<form method="post" action="<?php echo $page['pageurl'].$and.'a=supprimer'; ?>"><?php
+			<form method="post" action="<?php echo $page['pageurl'].$and.'a=supprimer'; ?>" accept-charset="utf-8"><?php
 				if (isset($erreur)) echo '<p class="erreur">'.$erreur.'</p>'; ?>
 
 				<p>
