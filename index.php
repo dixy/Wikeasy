@@ -132,7 +132,7 @@ if ($mode == 'modifier')
 		$categories = cache_categories();
 		
 		if ($namespace == NS_CATEGORIES)
-			unset($categories[$page['name']]);
+			unset($categories[array_search($page['title'], $categories)]);
 		
 		if (!empty($_GET['r']))
 		{
@@ -155,14 +155,14 @@ if ($mode == 'modifier')
 				$page['categories'] = array();
 				if (!empty($_POST['categories_page']) && is_array($_POST['categories_page']))
 					$page['categories'] = array_unique(array_filter($_POST['categories_page'], 
-						function ($c) use ($categories) { return isset($categories[$c]); }));
+						function ($c) use ($categories) { return in_array($c, $categories); }));
 				
 				
 				if (!empty($_POST['ajout_categorie']))
 				{
 					if (!empty($_POST['ajout_cat_nom']))
 					{
-						if (isset($categories[$_POST['ajout_cat_nom']]))
+						if (in_array($_POST['ajout_cat_nom'], $categories))
 						{
 							if (!in_array($_POST['ajout_cat_nom'], $page['categories']))
 							{
@@ -186,8 +186,6 @@ if ($mode == 'modifier')
 					
 					if (create_file($page, $namespace))
 					{
-						if ($namespace == NS_CATEGORIES)
-							cache_categories(CREATE_CACHE);
 						generate_cache_list($namespace, $page['title']);
 						redirect($page['pageurl'].(isset($page['redirect']) ? pageurl('&', '?').'redirect=no' : ''));
 					}
@@ -444,9 +442,6 @@ elseif ($mode == 'supprimer')
 				delete_history($page['name'], $namespace);
 				unlink(PATH_PG.$namespace.'/'.$page['name'].'.txt');
 				
-				if ($namespace == NS_CATEGORIES)
-					cache_categories(CREATE_CACHE);
-				
 				save_last_change($page['title'], $namespace, 0, array('delete' => 1));
 				generate_cache_list($namespace);
 				generate_deleted_articles_cache();
@@ -506,9 +501,6 @@ elseif ($mode == 'suppressions')
 						
 						generate_cache_list($undelete['namespace']);
 						generate_deleted_articles_cache();
-						
-						if ($undelete['namespace'] == NS_CATEGORIES)
-							cache_categories(CREATE_CACHE);
 						
 						redirect(base_path().
 								pageurl(($undelete['namespace'] != config_item('namespace_defaut') ? $undelete['namespace'].':' : '').art_title2url($page['name'])).

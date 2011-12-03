@@ -10,7 +10,7 @@ define('RETURN_VAL', TRUE); //Permet de retourner une valeur au lieu de l'affich
 define('DT_HOUR', TRUE); //Permet d'afficher l'heure avec une date
 define('DT_INTERVAL', TRUE); //Permet d'afficher un intervalle de temps plutôt qu'une date
 
-define('CREATE_CACHE', TRUE); //Indique qu'on veut créer le fichier de cache plutôt que le récupérer (utilisé avec cache_categories())
+define('CREATE_CACHE', TRUE); //Indique qu'on veut créer le fichier de cache plutôt que le récupérer.
 
 /**
  *	Retourne le titre de l'article à mettre dans une URL, à partir d'un
@@ -501,30 +501,12 @@ function show_error($message, $heading = 'Erreur', $back_index = TRUE)
  */
 function cache_categories($create = FALSE)
 {
-	$file = PATH_CACHE.'categories';
+	$file = PATH_CACHE.NS_CATEGORIES.'_pages';
 	
-	if ($create == CREATE_CACHE)
-	{
-		$cats = array();
-		$dir = dir(PATH_PG.NS_CATEGORIES);
-		while (($cat = $dir->read()) !== FALSE)
-		{
-			if ($cat[0] != '.')
-			{
-				$cat = substr($cat, 0, strpos($cat, '.'));
-				$cats[$cat] = art_title($cat);
-			}
-		}
-		$dir->close();
-		write_file($file, serialize($cats));
-	}
-	else
-	{
-		if (!is_file($file))
-			cache_categories(CREATE_CACHE);
-		
-		return unserialize(file_get_contents($file));
-	}
+	if (!is_file($file))
+		generate_cache_list(NS_CATEGORIES);
+	
+	return unserialize(file_get_contents($file));
 }
 
 /**

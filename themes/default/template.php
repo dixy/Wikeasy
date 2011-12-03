@@ -82,10 +82,10 @@
 							echo implode(', ', array_map(function ($c) { return '<input type="hidden" name="categories_page[]" value="'.$c.'" />'.$c; }, $page['categories']));
 						endif;
 						?></span> 
-						<?php if ($categories = array_diff_key($categories, array_flip($page['categories']))) : ?>
+						<?php if ($categories = array_diff($categories, $page['categories'])) : ?>
 						<select name="ajout_cat_nom" id="ajout_cat_nom" tabindex="3">
 							<option value="0"></option>
-							<?php foreach ($categories as $c_nom => $c_titre) : ?><option value="<?php echo $c_nom; ?>"><?php echo $c_titre; ?></option>
+							<?php foreach ($categories as $c) : ?><option value="<?php echo $c; ?>"><?php echo $c; ?></option>
 							<?php endforeach; ?>
 
 						</select>
