@@ -176,6 +176,8 @@ function generate_cache_list($namespace, $pagename = '')
 		$pages = unserialize(file_get_contents($cachefile));
 		if (!in_array($pagename, $pages))
 			$pages[] = $pagename;
+		else
+			return;
 	}
 	else
 	{
