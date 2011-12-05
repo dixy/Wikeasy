@@ -113,6 +113,8 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 				$categories[$cat][] = $page['title'];
 		write_file(PATH_CACHE.'pages_categories', serialize($categories));
 	}
+	else
+		generate_cache_redirects();
 	
 	return write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
 }
@@ -162,8 +164,8 @@ function write_file($name, $content = '')
 /**
  *	Créé le fichier de cache contenant la liste des pages.
  *  
- *  @param string $namespace    Espace de nom dans lequel il faut générer le fichier de cache.
- *  @param string $pagename     Si un titre de page est renseigné et que le fichier existe, se contente 
+ *  @param string $namespace     Espace de nom dans lequel il faut générer le fichier de cache.
+ *  @param string $pagename      Si un titre de page est renseigné et que le fichier existe, se contente 
  *      de vérifier si cette page est déjà dans le cache au lieu de recharger toutes les pages.
  */
 function generate_cache_list($namespace, $pagename = '')
@@ -197,6 +199,42 @@ function generate_cache_list($namespace, $pagename = '')
 	natcasesort($pages);
 		
 	write_file($cachefile, serialize($pages));
+}
+
+/**
+ *  Créé le fichier de cache contenant la liste des redirections par namespace.
+ */
+function generate_cache_redirects()
+{
+	$redirects = array();
+	
+	if ($ns_dir = dir(PATH_PG))
+	{
+		while (($ns = $ns_dir->read()) !== FALSE)
+		{
+			if ($ns[0] != '.' && $pages_dir = dir(PATH_PG.$ns))
+			{
+				$redirects[$ns] = array();
+				
+				while (($page = $pages_dir->read()) !== FALSE)
+				{
+					if ($page[0] != '.')
+					{
+						$page_content = unserialize(file_get_contents(PATH_PG.$ns.'/'.$page));
+						if (isset($page_content['redirect']))
+							$redirects[$ns][] = $page_content['title'];
+					}
+				}
+				
+				$pages_dir->close();
+				natcasesort($redirects[$ns]);
+			}
+		}
+		
+		$ns_dir->close();
+	}
+	
+	write_file(PATH_CACHE.'liste_redirections', serialize($redirects));
 }
 
 /**

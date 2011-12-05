@@ -397,6 +397,7 @@ elseif ($mode == 'renommer')
 						save_last_change($page['title'], $namespace, 0, array('oldname' => $oldpage['title']));
 						
 						generate_cache_list($namespace);
+						generate_cache_redirects();
 						redirect(base_path().pageurl(ns_name($namespace).art_title2url($page['title'])));
 					} else $erreur = 'Erreur lors du renommage de l\'article.';
 				} else $erreur = 'Le nouveau titre choisi est déjà utilisé.';
@@ -410,10 +411,10 @@ elseif ($mode == 'redirections')
 {
 	set_title('Liste des redirections');
 	
-	if (!is_file(PATH_CACHE.'liste_redirections.php'))
-		generate_cache_list($namespace);
+	if (!is_file(PATH_CACHE.'liste_redirections'))
+		generate_cache_redirects();
 	
-	require PATH_CACHE.'liste_redirections.php';
+	$redirects = unserialize(file_get_contents(PATH_CACHE.'liste_redirections'));
 }
 elseif ($mode == 'supprimer')
 {
@@ -445,6 +446,7 @@ elseif ($mode == 'supprimer')
 				save_last_change($page['title'], $namespace, 0, array('delete' => 1));
 				generate_cache_list($namespace);
 				generate_deleted_articles_cache();
+				if (isset($page['redirect'])) generate_cache_redirects();
 				redirect();
 			}
 			else $erreur = 'Erreur lors de la création du fichier de restauration.';
@@ -501,6 +503,9 @@ elseif ($mode == 'suppressions')
 						
 						generate_cache_list($undelete['namespace']);
 						generate_deleted_articles_cache();
+						
+						if ($undelete['isredirect'])
+							generate_cache_redirects();
 						
 						redirect(base_path().
 								pageurl(ns_name($undelete['namespace']).art_title2url($page['name'])).

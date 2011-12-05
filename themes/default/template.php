@@ -285,15 +285,15 @@
 			endif;
 		elseif ($mode == 'redirections') : ?>
 			<h1>Liste des redirections</h1>
-			<?php if (empty($redirects_list)) : ?>
+			<?php $nbr = 0; foreach ($redirects as $ns => $c) $nbr += count($c); if ($nbr == 0) : ?>
 				<p>Aucune redirection trouvée.</p>
 			<?php else : ?>
-				<p><?php echo count($redirects_list).' '.plural(count($redirects_list), 'redirection trouvée', 'redirections trouvées').'.'; ?></p>
+				<p><?php echo $nbr.' '.plural($nbr, 'redirection trouvée', 'redirections trouvées').'.'; ?></p>
 				
 				<ul>
-					<?php foreach ($redirects_list as $name => $title) : ?>
-						<li><a href="<?php echo pageurl(art_title2url($title)).$and.'redirect=no'; ?>"><?php echo $title; ?></a></li>
-					<?php endforeach; ?>
+					<?php foreach ($redirects as $ns => $redir) : foreach ($redir as $name) : ?>
+						<li><a href="<?php echo pageurl(ns_name($ns).art_title2url($name)).$and.'redirect=no'; ?>"><?php echo ns_name($ns).$name; ?></a></li>
+					<?php endforeach; endforeach; ?>
 				</ul>
 			<?php endif;
 		elseif ($mode == 'renommer') : require PATH.theme_url(RETURN_VAL).'_rename.php';
