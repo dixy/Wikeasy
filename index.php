@@ -303,7 +303,7 @@ elseif ($mode == 'liste')
 	if (!is_file(PATH_CACHE.$ns.'_pages'))
 		generate_cache_list($ns);
 	
-	$liste_pages = unserialize(file_get_contents(PATH_CACHE.$ns.'_pages'));
+	$liste_pages = get_serialized(PATH_CACHE.$ns.'_pages');
 }
 elseif ($mode == 'historique')
 {
@@ -359,7 +359,7 @@ elseif ($mode == 'modifications-recentes')
 	
 	$recentchanges = array();
 	if (is_file(PATH_CACHE.'modifications_recentes'))
-		$recentchanges = unserialize(file_get_contents(PATH_CACHE.'modifications_recentes'));
+		$recentchanges = get_serialized(PATH_CACHE.'modifications_recentes');
 }
 elseif ($mode == 'renommer')
 {
@@ -414,7 +414,7 @@ elseif ($mode == 'redirections')
 	if (!is_file(PATH_CACHE.'liste_redirections'))
 		generate_cache_redirects();
 	
-	$redirects = unserialize(file_get_contents(PATH_CACHE.'liste_redirections'));
+	$redirects = get_serialized(PATH_CACHE.'liste_redirections');
 }
 elseif ($mode == 'supprimer')
 {
@@ -464,7 +464,7 @@ elseif ($mode == 'suppressions')
 	
 	foreach ($pages_deleted as $name => &$infos)
 		if (is_file(PATH_CNT.'suppressions/'.$infos))
-			$infos = unserialize(file_get_contents(PATH_CNT.'suppressions/'.$infos));
+			$infos = get_serialized(PATH_CNT.'suppressions/'.$infos);
 	
 	if (!empty($_GET['r']))
 	{

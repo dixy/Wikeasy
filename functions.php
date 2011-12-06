@@ -51,16 +51,16 @@ function clean_title($url)
  *	@param string $nom  Nom de la page, si elle n'existe pas retourne des valeurs par défaut.
  *  @param string $namespace
  */
-function get_page($nom, $namespace = '')
+function get_page($name, $namespace = '')
 {
 	if ($namespace == '')
 		$namespace = config_item('namespace_defaut');
 	
 	$return = array(
-		'name' => $nom,
-		'title' => art_title($nom),
+		'name' => $name,
+		'title' => art_title($name),
 		'content' => '',
-		'pageurl' => pageurl(ns_name($namespace).art_title2url($nom)),
+		'pageurl' => pageurl(ns_name($namespace).art_title2url($name)),
 		'status' => 'public',
 		'lastmodif' => '',
 		'lastversion' => 0,
@@ -68,10 +68,10 @@ function get_page($nom, $namespace = '')
 		'page_exists' => FALSE
 	);
 	
-	$nom_fichier = PATH_PG.$namespace.'/'.$nom.'.txt';
-	if (is_file($nom_fichier))
+	$filename = PATH_PG.$namespace.'/'.$name.'.txt';
+	if (is_file($filename))
 	{
-		$return = unserialize(file_get_contents($nom_fichier));
+		$return = get_serialized($filename);
 		$return['page_exists'] = TRUE;
 		$return['pageurl'] = base_path().pageurl(ns_name($namespace).art_title2url($return['title']));
 	}
@@ -175,7 +175,7 @@ function generate_cache_list($namespace, $pagename = '')
 	
 	if ($pagename != '' && is_file($cachefile))
 	{
-		$pages = unserialize(file_get_contents($cachefile));
+		$pages = get_serialized($cachefile);
 		if (!in_array($pagename, $pages))
 			$pages[] = $pagename;
 		else
@@ -188,7 +188,7 @@ function generate_cache_list($namespace, $pagename = '')
 		{
 			if ($page[0] != '.')
 			{
-				$page_content = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$page));
+				$page_content = get_serialized(PATH_PG.$namespace.'/'.$page);
 				if (!isset($page_content['redirect']))
 					$pages[] = $page_content['title'];
 			}
@@ -220,7 +220,7 @@ function generate_cache_redirects()
 				{
 					if ($page[0] != '.')
 					{
-						$page_content = unserialize(file_get_contents(PATH_PG.$ns.'/'.$page));
+						$page_content = get_serialized(PATH_PG.$ns.'/'.$page);
 						if (isset($page_content['redirect']))
 							$redirects[$ns][] = $page_content['title'];
 					}
@@ -250,7 +250,7 @@ function set_title($title = '')
 function get_title()
 {
 	$title = set_title();
-	echo $title.(!empty($title) ? ' - ' : '').config_item('nom_wiki');
+	echo $title.($title != '' ? ' - ' : '').config_item('nom_wiki');
 }
 
 /**
@@ -332,10 +332,12 @@ function get_ip()
 	return $_SERVER['REMOTE_ADDR'];
 }
 
+/**
+ *  Parse un texte en wiki.
+ *  Vérifie d'abord si ce n'est pas une redirection.
+ */
 function parsewiki($text)
 {
-	require_once PATH.'wikirenderer.lib.php';
-	
 	if (substr($text, 0, 9) == '#REDIRECT')
 	{
 		preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $text, $r);
@@ -344,6 +346,8 @@ function parsewiki($text)
 			   pageurl(art_title2url(clean_title($r[1]))).'">'.
 			   htmlspecialchars($r[1]).'</a></p></div>';
 	}
+	
+	require_once PATH.'wikirenderer.lib.php';
 	
 	$wiki = new WikiRenderer();
 	return $wiki->render($text);
@@ -354,13 +358,12 @@ function parsewiki($text)
  */
 function pageurl($normal, $rewrite = '')
 {
-	if (empty($rewrite))
-	{
-		if (config_item('pageurl_type') == 'rewrite') return $normal;
-		return 'index.php?page='.$normal;
-	}
+	if (config_item('pageurl_type') == 'rewrite' && $rewrite)
+		return $rewrite;
 	
-	if (config_item('pageurl_type') == 'rewrite') return $rewrite;
+	if (config_item('pageurl_type') != 'rewrite' && !$rewrite)
+		return 'index.php?page='.$normal;
+	
 	return $normal;
 }
 
@@ -372,7 +375,7 @@ function save_last_change($pagetitle, $namespace = '', $version = 0, $special = 
 	if (!is_file(PATH_CACHE.'modifications_recentes'))
 		$recentchanges = array();
 	else
-		$recentchanges = unserialize(file_get_contents(PATH_CACHE.'modifications_recentes'));
+		$recentchanges = get_serialized(PATH_CACHE.'modifications_recentes');
 	
 	$time = time();
 	
@@ -490,7 +493,7 @@ function deleted_articles()
 	if (!is_file(PATH_CACHE.'liste_supprimes'))
 		generate_deleted_articles_cache();
 	
-	return unserialize(file_get_contents(PATH_CACHE.'liste_supprimes'));
+	return get_serialized(PATH_CACHE.'liste_supprimes');
 }
 
 /**
@@ -544,7 +547,7 @@ function cache_categories()
 	if (!is_file($file))
 		generate_cache_list(NS_CATEGORIES);
 	
-	return unserialize(file_get_contents($file));
+	return get_serialized($file);
 }
 
 /**
@@ -565,7 +568,7 @@ function cache_pages_categories($create = FALSE)
 		{
 			if ($page[0] != '.')
 			{
-				$contenu = unserialize(file_get_contents($dir->path.'/'.$page));
+				$contenu = get_serialized($dir->path.'/'.$page);
 				foreach ($contenu['categories'] as $c)
 				{
 					if (!isset($contenu['redirect']))
@@ -586,7 +589,7 @@ function cache_pages_categories($create = FALSE)
 		if (!is_file($file))
 			cache_pages_categories(CREATE_CACHE);
 		
-		return unserialize(file_get_contents($file));
+		return get_serialized($file);
 	}
 }
 
@@ -600,7 +603,7 @@ function cache_pages_categories($create = FALSE)
  */
 function reset_page_categories($categories, $namespace, $pagename)
 {
-	$page = unserialize(file_get_contents(PATH_PG.$namespace.'/'.$pagename.'.txt'));
+	$page = get_serialized(PATH_PG.$namespace.'/'.$pagename.'.txt');
 	
 	foreach ($page['categories'] as $cat)
 	{
@@ -617,6 +620,14 @@ function reset_page_categories($categories, $namespace, $pagename)
 function ns_name($ns)
 {
 	return ($ns != config_item('namespace_defaut') ? $ns.':' : '');
+}
+
+/**
+ *  Retourne un tableau à partir d'un tableau linéarisé.
+ */
+function get_serialized($file)
+{
+	return unserialize(file_get_contents($file));
 }
 
 /* End of file functions.php */
