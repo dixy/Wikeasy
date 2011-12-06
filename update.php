@@ -188,10 +188,6 @@ function up_04_to_05()
 			if (!is_dir(PATH_CNT.'historique/'.$ns.'/'.$page['name']))
 				mkdir(PATH_CNT.'historique/'.$ns.'/'.$page['name'], 0777);
 			
-			if (substr($page['content'], 0, 9) == '#REDIRECT')
-				if (preg_match('`#REDIRECT\s*\[\[([^\[]+)]]`i', $page['content'], $r))
-					$page['redirect'] = art_title2url(clean_title($r[1]));
-			
 			write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
 			unlink($dir->path.'/'.$p);
 			
