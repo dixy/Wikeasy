@@ -105,6 +105,8 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	if (!$noparse)
 		$page['content'] = parsewiki($page['content']);
 	
+	$test = write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
+	
 	if (!isset($page['redirect']))
 	{
 		$categories = reset_page_categories(cache_pages_categories(), $ns, $page['name']);
@@ -116,7 +118,7 @@ function create_file($page, $ns = '', $noparse = FALSE, $createrevision = TRUE, 
 	else
 		generate_cache_redirects();
 	
-	return write_file(PATH_PG.$ns.'/'.$page['name'].'.txt', serialize($page));
+	return $test;
 }
 
 /**
@@ -175,6 +177,9 @@ function generate_cache_list($namespace, $pagename = '')
 	
 	if ($pagename != '' && is_file($cachefile))
 	{
+		if (array_key_exists('redirect', get_serialized(PATH_PG.$namespace.'/'.$pagename.'.txt')))
+			return;
+		
 		$pages = get_serialized($cachefile);
 		if (!in_array($pagename, $pages))
 			$pages[] = $pagename;
@@ -278,7 +283,7 @@ function install()
 		create_file(array(
 			'name' => 'Accueil', 'title' => 'Accueil', 'content' => "L'installation s'est bien déroulée.".
 			"\n\nVos identifiants de connexion sont __admin__ et __123456__.%%%\nVous pouvez modifier ".
-			"ces informations en vous connectant.", 
+			"ces informations en vous connectant.", 'categories' => array(),
 			'status' => 'public', 'lastversion' => 0));
 		redirect();
 	}

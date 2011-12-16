@@ -186,7 +186,7 @@ if ($mode == 'modifier')
 					
 					if (create_file($page, $namespace))
 					{
-						generate_cache_list($namespace, $page['title']);
+						generate_cache_list($namespace, $page['name']);
 						redirect($page['pageurl'].(isset($page['redirect']) ? pageurl('&', '?').'redirect=no' : ''));
 					}
 					
